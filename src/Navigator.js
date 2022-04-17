@@ -2,7 +2,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View,Image, Text} from 'react-native';
+import { View,Image, Text,Dimensions} from 'react-native';
 
 // Screens
 import FirstScreen from "./screens/FirstScreen";
@@ -30,6 +30,8 @@ const settingsScreen = 'SettingsScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const windowWdth = Dimensions.get('window').width;
+
 function BottomNavigator()
 {
     return(
@@ -44,11 +46,15 @@ function BottomNavigator()
                     position: 'absolute',
                     bottom: 30,
                     height: 90,
-                    left: 20,
-                    right: 20,
+                    left: windowWdth * 0.05,
+                    right: windowWdth * 0.05,
+                    width: windowWdth * 0.9,
                     elevation: 10,
                     borderRadius: 15,
-                    backgroundColor: 'rgb(61,61,61)'
+                    backgroundColor: 'rgb(61,61,61)',
+                    alignItems:"center",
+                    alignContent:"center",
+                    justifyContent:"center",
                 }
             }}
         >

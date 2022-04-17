@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View,Image, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView,Switch} from 'react-native'
 import { useNavigation } from "@react-navigation/native";
-import Logo from "../assets/logo-no-text.png";
+import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
