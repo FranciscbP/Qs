@@ -43,6 +43,7 @@ function BottomNavigator()
                 activeTintColor: '#0091EA',
                 inactiveTintColor: 'gray',
                 tabBarStyle:{
+                    borderColor:'rgb(61,61,61)',
                     position: 'absolute',
                     bottom: 30,
                     height: 90,

@@ -3,10 +3,10 @@ import { View,Image, StyleSheet, Text, TouchableOpacity,ScrollView,Animated,Dime
 import { useNavigation } from "@react-navigation/native";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps'; 
-import logo from "../assets/logo-no-text.png";
+import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 
 const windowWdth = Dimensions.get('window').width;
+const cardWdth = windowWdth * 0.9;
 
 export default function MainScreen({navigation})
 {
@@ -19,10 +19,13 @@ export default function MainScreen({navigation})
     const markersList = [];
     const [mList, setMList] = useState(markersList);
 
+    const [selectedLocationIndex,setSelectedLocationIndex] = useState(0);
+
     //Reload Screen
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setLoadMarkers(true);
+            setSelectedLocationIndex(0);
         });
         return unsubscribe;
       }, [navigation]);
@@ -31,7 +34,13 @@ export default function MainScreen({navigation})
     const VeryBusyColor = "red";
     const BusyColor = "yellow";
     const NotBusyColor ="green";
-    const NoStatusColor = "wheat";
+    const NoStatusColor = "grey";
+
+    let mapAnimation = new Animated.Value(0);
+    let mapIndex = 0;
+
+    const _map = React.useRef(null);
+    const _scrollView = React.useRef(null);
 
     const getMarkers = async() =>
     {
@@ -224,24 +233,27 @@ export default function MainScreen({navigation})
         if (mList.length > 0)
         {
             return mList.map((mLst,index) =>  
-                <Marker 
-                key={index}
-                coordinate={{latitude: mLst.placeLocation.latitude,longitude: mLst.placeLocation.longitude}}
-                title={mLst.placeName}
-                description={mLst.placeStatus}
-                pinColor={mLst.placeStatusColor}>
-                {/* <Image source={require('../assets/marker.png')} resizeMode="contain" style={{maxHeight:29, maxWidth:29 ,tintColor:mLst.placeStatusColor}} />  */}
-                </Marker>                
-            )
+                    <Marker 
+                    key={index}
+                    coordinate={{latitude: mLst.placeLocation.latitude,longitude: mLst.placeLocation.longitude}}
+                    // title={mLst.placeName}
+                    // description={mLst.placeStatus}
+                    // pinColor={mLst.placeStatusColor}
+                    zIndex={selectedLocationIndex == index ? 999 : 0}
+                    onPress={(e) => onMarkerPress(e)}
+                    >
+                        <Animated.View style={{alignItems:"center", justifyContent:"center",width:50,height:50,}}>
+                            <Animated.Image 
+                                source={require('../assets/marker.png')}
+                                resizeMode="cover"
+                                style={{maxHeight: selectedLocationIndex === index ? 40:30, maxWidth: selectedLocationIndex === index ? 40 : 30 ,tintColor:mLst.placeStatusColor}}
+                            />
+                        </Animated.View>
+                    </Marker>  
+            );
+            
         }
     }
-
-    // const mapAnimation = new Animated.Value(0);
-    // const mapIndex = 0;
-
-    // useEffect(() => {
-    //     mapAnimation.addListener({value}) => {}
-    // })
 
     const drawCardScrollList = () =>
     {
@@ -252,6 +264,7 @@ export default function MainScreen({navigation})
                 return (
                     
                     <Animated.ScrollView
+                    ref={_scrollView}
                     horizontal
                     scrollEventThrottle={1}
                     showsHorizontalScrollIndicator={false}
@@ -259,26 +272,30 @@ export default function MainScreen({navigation})
                     pagingEnabled
                     snapToInterval={windowWdth}
                     snapToAlignment="center"
-
-                    // onScroll={Animated.event(
-                    //     [
-                    //         {
-                    //             nativeEvent: {
-                    //                 contentOffset: {
-                    //                     x: mapAnimation,
-                    //                 }
-                    //             }
-                    //         }
-                    //     ]
-                    // )}
+                    onScroll={onScroll()}
                     >
                         {
                             mList.map((mLst,index) => (
                                 <View style={styles.card} key={index}>
-                                <View>
-                                    <Text numberOfLines={1} style={styles.cardTitle}>{mLst.placeName}</Text>
-                                    <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor}}>{mLst.placeStatus}</Text>
-                                </View>
+                                    <View style={{flex:1, justifyContent:"center", alignItems:"center"}}>
+                                        <Text numberOfLines={1} style={styles.cardTitle}>{mLst.placeName}</Text>
+                                    </View>
+                                    <View style={{flex:2}}> 
+                                        <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
+                                            <Text style={{color:"grey"}}>Queue Status: </Text>
+                                            <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
+                                        </View>
+                                        <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}> 
+                                            <Text style={{color:"grey"}}>Last Updated: </Text>
+                                            <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
+                                        </View>
+                                        <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
+                                            <TouchableOpacity  style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                                                <Text style={{color:"white"}}>Update Queue Status</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+
                                 </View>
                             )
                         )}
@@ -290,13 +307,79 @@ export default function MainScreen({navigation})
   
     }
 
+    const onMarkerPress = (mapEventData) =>
+    {
+        const markerID = mapEventData._targetInst.return.key;
+
+        let x = (markerID * windowWdth);
+        _scrollView.current.scrollTo({x: x, y:0, animated: true})
+    }
+
+    const onScroll = () =>
+    {
+        return (
+            Animated.event(
+            [
+                {
+                    nativeEvent: {
+                        contentOffset: {
+                            x: mapAnimation,
+                        }
+                    }
+                }
+            ],
+            {useNativeDriver: true}
+        ));
+    }
+
+    useEffect(() => {
+        mapAnimation.addListener(({value}) => 
+        {
+            if(mList.length != 0)
+            {   
+                let index = Math.floor((value / cardWdth) + 0.3); 
+                if(index >= mList.length)
+                {
+                    index = mList.length -1;
+                }
+                if(index <= 0)
+                {
+                    index = 0;
+                }
+                
+                {
+                    index = index;
+                }
+            
+                clearTimeout(regionTimeout);
+        
+                const regionTimeout = setTimeout(() =>
+                {
+                    if(mapIndex != index)
+                    {
+                        mapIndex = index; 
+                        setSelectedLocationIndex(mapIndex); 
+                        _map.current.animateToRegion(
+                            {
+                                latitude:mList[index].placeLocation.latitude,
+                                longitude: mList[index].placeLocation.longitude,
+                                latitudeDelta: 0.006,
+                                longitudeDelta: 0.007,
+                            },550
+                        )
+                    }
+                });
+            }
+    });
+});
+    
     const whileLoading = () =>
     {
         if(loadMarkers)
         {
            return(
                 <MapView
-                provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+                provider={PROVIDER_GOOGLE}
                 style={styles.map}
                 region={{
                     latitude: 52.95402230,
@@ -309,19 +392,38 @@ export default function MainScreen({navigation})
         }
         else
         {
-            return (
-                <MapView
-                provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                style={styles.map}
-                region={{
-                    latitude: 52.95402230,
-                    longitude: -1.15498920,
-                    latitudeDelta: 0.010,
-                    longitudeDelta: 0.0170,
-                }}>
-                {drawMarkers()}
-                </MapView>
-            )
+            if (mList.length > 0)
+            {
+                return (
+                    <MapView
+                    ref = {_map}
+                    provider={PROVIDER_GOOGLE}
+                    style={styles.map}
+                    region={{
+                        latitude: mList[selectedLocationIndex].placeLocation.latitude,
+                        longitude: mList[selectedLocationIndex].placeLocation.longitude,
+                        latitudeDelta: 0.006,
+                        longitudeDelta: 0.007,
+                    }}>
+                    {drawMarkers()}
+                    </MapView>
+                )
+            }
+            else
+            {
+                return(
+                    <MapView
+                    provider={PROVIDER_GOOGLE}
+                    style={styles.map}
+                    region={{
+                        latitude: 52.95402230,
+                        longitude: -1.15498920,
+                        latitudeDelta: 0.010,
+                        longitudeDelta: 0.0170,
+                    }}>
+                    </MapView>
+               )
+            }
         }
     }
 
@@ -386,7 +488,7 @@ const styles = StyleSheet.create({
       },
     scrollView: {
         bottom: 130,
-        height: 60,
+        height: 200,
         left: 0,
         right: 0,
         width: windowWdth,
@@ -398,20 +500,20 @@ const styles = StyleSheet.create({
         marginLeft: windowWdth * 0.05,
         marginRight: windowWdth * 0.05,
         overflow:"hidden",
-        backgroundColor: "#fff",
-        borderRadius: 5,
+        backgroundColor: "rgb(89,89,89)",
+        borderRadius: 10,
         marginVertical:0,
         marginHorizontal: 0,
         height: '100%',
-        width: windowWdth * 0.9,  
-        paddingStart: 5,      
+        width: cardWdth,    
     },
     textContent: {
         flex:2,
         padding:10,
     },
     cardTitle: {
-        fontSize: 18,
+        justifyContent:"center",
+        fontSize: 24,
         color: "#F95F6B",
     },
     cardDescription: {
