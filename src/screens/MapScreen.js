@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View,Image, StyleSheet, Text, TouchableOpacity,ScrollView,Animated,Dimensions } from 'react-native'
+import { View,Image, StyleSheet, Text,ScrollView,Animated,Dimensions,TouchableOpacity} from 'react-native';
+
 import { useNavigation } from "@react-navigation/native";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
+
 
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
@@ -12,16 +14,15 @@ export default function MainScreen({navigation})
 {
     const navigator = useNavigation();
 
-    const markersData = [];
     const user = auth().currentUser;
     const [loadMarkers, setLoadMarkers] = useState(true);
     
+    const favouritsList = [];
+
     const markersList = [];
     const [mList, setMList] = useState(markersList);
 
     const [selectedLocationIndex,setSelectedLocationIndex] = useState(0);
-
-    const [toFirstCard,setToFirstCard] = useState(0);
 
     //Reload Screen
     useEffect(() => {
@@ -36,7 +37,7 @@ export default function MainScreen({navigation})
     const VeryBusyColor = "red";
     const BusyColor = "yellow";
     const NotBusyColor ="green";
-    const NoStatusColor = "grey";
+    const NoStatusColor = "orange";
 
     let mapAnimation = new Animated.Value(0);
     let mapIndex = 0;
@@ -44,9 +45,25 @@ export default function MainScreen({navigation})
     const _map = React.useRef(null);
     const _scrollView = React.useRef(null);
 
+    const checkIsFavourite = (placeId) =>
+    {
+        let isFavourite = false;
+
+        favouritsList.map((fList) =>
+        { 
+            if(fList.placeId == placeId)
+            {
+                isFavourite = true;
+            }
+        });
+
+
+        return isFavourite;
+    }
+
     const getMarkers = async() =>
     {
-        markersData.splice(0, markersData.length);
+        markersList.splice(0, markersList.length);
 
         const userRef = firestore().collection('Users').doc(user.uid);
         const userSnapshot = await userRef.get()
@@ -54,6 +71,18 @@ export default function MainScreen({navigation})
         const showBars = userSnapshot.data().showBars;
         const showClubs = userSnapshot.data().showClubs;
         const showRestaurants = userSnapshot.data().showRestaurants;
+
+        const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
+        const favSnapshot = await favRef.get();
+
+        favSnapshot.forEach(doc =>
+        {
+            const favPlaceId = doc.data().PlaceID;
+
+            favouritsList.push({
+                placeId: favPlaceId,
+            })
+        });
 
         if(showBars)
         {
@@ -68,44 +97,108 @@ export default function MainScreen({navigation})
                 const placeStatus = doc.data().Status;
 
                 if(placeStatus == "Not Busy")
-                {
+                {   
+                   const checkIfFavourite = checkIsFavourite(placeId)
+                   if(checkIfFavourite)
+                   {
+                        markersList.push({
+                            placeId: placeId,
+                            placeName: placeName,
+                            placeLocation: placeLocation,
+                            placeStatus: placeStatus,
+                            placeStatusColor: NotBusyColor,
+                            placeIsFavourite: true,
+                        });
+                   }
+                   else
+                   {
                     markersList.push({
                         placeId: placeId,
                         placeName: placeName,
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: NotBusyColor,
+                        placeIsFavourite: false,
                     });
+                   }
                 }
                 else if(placeStatus == "Busy")
                 {
-                    markersList.push({
-                        placeId: placeId,
-                        placeName: placeName,
-                        placeLocation: placeLocation,
-                        placeStatus: placeStatus,
-                        placeStatusColor: BusyColor,
-                    });
+                    const checkIfFavourite = checkIsFavourite(placeId)
+                    if(checkIfFavourite)
+                    {
+                         markersList.push({
+                             placeId: placeId,
+                             placeName: placeName,
+                             placeLocation: placeLocation,
+                             placeStatus: placeStatus,
+                             placeStatusColor: BusyColor,
+                             placeIsFavourite: true,
+                         });
+                    }
+                    else
+                    {
+                     markersList.push({
+                         placeId: placeId,
+                         placeName: placeName,
+                         placeLocation: placeLocation,
+                         placeStatus: placeStatus,
+                         placeStatusColor: BusyColor,
+                         placeIsFavourite: false,
+                     });
+                    }
                 }
                 else if(placeStatus == "Very Busy")
                 {
-                    markersList.push({
-                        placeId: placeId,
-                        placeName: placeName,
-                        placeLocation: placeLocation,
-                        placeStatus: placeStatus,
-                        placeStatusColor: VeryBusyColor,
-                    });
+                    const checkIfFavourite = checkIsFavourite(placeId)
+                    if(checkIfFavourite)
+                    {
+                         markersList.push({
+                             placeId: placeId,
+                             placeName: placeName,
+                             placeLocation: placeLocation,
+                             placeStatus: placeStatus,
+                             placeStatusColor: VeryBusyColor,
+                             placeIsFavourite: true,
+                         });
+                    }
+                    else
+                    {
+                     markersList.push({
+                         placeId: placeId,
+                         placeName: placeName,
+                         placeLocation: placeLocation,
+                         placeStatus: placeStatus,
+                         placeStatusColor: VeryBusyColor,
+                         placeIsFavourite: false,
+                     });
+                    }
                 }
                 else if (placeStatus == "No Status")
                 {
-                    markersList.push({
-                        placeId: placeId,
-                        placeName: placeName,
-                        placeLocation: placeLocation,
-                        placeStatus: placeStatus,
-                        placeStatusColor: NoStatusColor,
-                    });
+                    const checkIfFavourite = checkIsFavourite(placeId)
+                    if(checkIfFavourite)
+                    {
+                         markersList.push({
+                             placeId: placeId,
+                             placeName: placeName,
+                             placeLocation: placeLocation,
+                             placeStatus: placeStatus,
+                             placeStatusColor: NoStatusColor,
+                             placeIsFavourite: true,
+                         });
+                    }
+                    else
+                    {
+                     markersList.push({
+                         placeId: placeId,
+                         placeName: placeName,
+                         placeLocation: placeLocation,
+                         placeStatus: placeStatus,
+                         placeStatusColor: NoStatusColor,
+                         placeIsFavourite: false,
+                     });
+                    }
                 }
             });
         }
@@ -115,6 +208,18 @@ export default function MainScreen({navigation})
             const clubs = firestore().collection('Places').where('Type','==','Club');
             const clubsSnapshot = await clubs.get();
 
+            const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
+            const favSnapshot = await favRef.get();
+    
+            favSnapshot.forEach(doc =>
+            {
+                const favPlaceId = doc.data().PlaceID;
+    
+                favouritsList.push({
+                    placeId: favPlaceId,
+                })
+            });
+
             clubsSnapshot.forEach(doc => 
                 {   
                     const placeId = doc.id;
@@ -123,44 +228,108 @@ export default function MainScreen({navigation})
                     const placeStatus = doc.data().Status;
     
                     if(placeStatus == "Not Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NotBusyColor,
-                        });
+                    {   
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                                markersList.push({
+                                    placeId: placeId,
+                                    placeName: placeName,
+                                    placeLocation: placeLocation,
+                                    placeStatus: placeStatus,
+                                    placeStatusColor: NotBusyColor,
+                                    placeIsFavourite: true,
+                                });
+                        }
+                        else
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: NotBusyColor,
+                                placeIsFavourite: false,
+                            });
+                        }
                     }
                     else if(placeStatus == "Busy")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: BusyColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                     else if(placeStatus == "Very Busy")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: VeryBusyColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                     else if (placeStatus == "No Status")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: NoStatusColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                 });
         }
@@ -170,6 +339,18 @@ export default function MainScreen({navigation})
             const restaurants = firestore().collection('Places').where('Type','==','Restaurant');
             const restaurantsSnapshot = await restaurants.get();
 
+            const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
+            const favSnapshot = await favRef.get();
+    
+            favSnapshot.forEach(doc =>
+            {
+                const favPlaceId = doc.data().PlaceID;
+    
+                favouritsList.push({
+                    placeId: favPlaceId,
+                })
+            });
+
             restaurantsSnapshot.forEach(doc => 
                 {   
                     const placeId = doc.id;
@@ -178,44 +359,108 @@ export default function MainScreen({navigation})
                     const placeStatus = doc.data().Status;
     
                     if(placeStatus == "Not Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NotBusyColor,
-                        });
+                    {   
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                                markersList.push({
+                                    placeId: placeId,
+                                    placeName: placeName,
+                                    placeLocation: placeLocation,
+                                    placeStatus: placeStatus,
+                                    placeStatusColor: NotBusyColor,
+                                    placeIsFavourite: true,
+                                });
+                        }
+                        else
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: NotBusyColor,
+                                placeIsFavourite: false,
+                            });
+                        }
                     }
                     else if(placeStatus == "Busy")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: BusyColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                     else if(placeStatus == "Very Busy")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: VeryBusyColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                     else if (placeStatus == "No Status")
                     {
+                        const checkIfFavourite = checkIsFavourite(placeId)
+                        if(checkIfFavourite)
+                        {
+                            markersList.push({
+                                placeId: placeId,
+                                placeName: placeName,
+                                placeLocation: placeLocation,
+                                placeStatus: placeStatus,
+                                placeStatusColor: NoStatusColor,
+                                placeIsFavourite: true,
+                            });
+                        }
+                        else
+                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
+                            placeIsFavourite: false,
                         });
+                        }
                     }
                 });
         }
@@ -230,49 +475,49 @@ export default function MainScreen({navigation})
         .then(()=>{setLoadMarkers(false)}); 
     }
 
-    const showMarker = (index) =>
-    {
-        if(mList[index].placeStatus == "Not Busy")
-        {
-            return(
-                <Animated.Image 
-                source={require('../assets/marker-notBusy.png')}
-                resizeMode="cover"
-                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-            />
-            )
-        }
-        else if(mList[index].placeStatus == "Busy")
-        {
-            return(
-                <Animated.Image 
-                source={require('../assets/marker-busy.png')}
-                resizeMode="cover"
-                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-            />
-            )
-        }
-        else if(mList[index].placeStatus == "Very Busy")
-        {
-            return(
-                <Animated.Image 
-                source={require('../assets/marker-veryBusy.png')}
-                resizeMode="cover"
-                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-            />
-            )
-        }
-        else if (mList[index].placeStatus == "No Status")
-        {
-            return(
-                <Animated.Image 
-                source={require('../assets/marker-noStatus.png')}
-                resizeMode="cover"
-                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-            />
-            )
-        }
-    }
+    // const showMarker = (index) =>
+    // {
+    //     if(mList[index].placeStatus == "Not Busy")
+    //     {
+    //         return(
+    //             <Animated.Image 
+    //             source={require('../assets/map_marker.png')}
+    //             resizeMode="cover"
+    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+    //         />
+    //         )
+    //     }
+    //     else if(mList[index].placeStatus == "Busy")
+    //     {
+    //         return(
+    //             <Animated.Image 
+    //             source={require('../assets/map_marker.png')}
+    //             resizeMode="cover"
+    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+    //         />
+    //         )
+    //     }
+    //     else if(mList[index].placeStatus == "Very Busy")
+    //     {
+    //         return(
+    //             <Animated.Image 
+    //             source={require('../assets/map_marker.png')}
+    //             resizeMode="cover"
+    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+    //         />
+    //         )
+    //     }
+    //     else if (mList[index].placeStatus == "No Status")
+    //     {
+    //         return(
+    //             <Animated.Image 
+    //             source={require('../assets/map_marker.png')}
+    //             resizeMode="contain"
+    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+    //         />
+    //         )
+    //     }
+    // }
 
     const drawMarkers = () =>
     {
@@ -282,17 +527,48 @@ export default function MainScreen({navigation})
                     <Marker 
                     key={index}
                     coordinate={{latitude: mLst.placeLocation.latitude,longitude: mLst.placeLocation.longitude}}
-                    // title={mLst.placeName}
-                    // description={mLst.placeStatus}
-                    // pinColor={mLst.placeStatusColor}
+                    pinColor={mLst.placeStatusColor}
+
                     zIndex={selectedLocationIndex == index ? 999 : 0}
                     onPress={(e) => onMarkerPress(e)}
                     >
-                        <Animated.View style={{alignItems:"center", justifyContent:"center",width:40,height:40,}}>
+                        {/* <View style={{borderWidth:1,borderColor:"red"}}>
                             {showMarker(index)}
-                        </Animated.View>
+                        </View> */}
                     </Marker>  
             );
+        }
+    }
+
+    const onFavBtnPress = (index) =>
+    {
+       // console.log(index);
+    }
+    
+    const drawFavBtn = (index) =>
+    {
+        if(mList[index].placeIsFavourite == true)
+        {
+            return (
+                <Image
+                disabled ={true}
+                source={require('../assets/heart.png')}
+                resizeMode="cover"
+                style={{tintColor: "#F95F6B",width:40,height:40}}
+                />
+            )
+        }
+        else
+        {
+            return (
+                <Image
+                disabled ={true}
+                // onPress={onFavBtnPress(index)}
+                source={require('../assets/heart.png')}
+                resizeMode="cover"
+                style={{tintColor: "white",width:40,height:40}}
+                />
+            )
         }
     }
 
@@ -305,6 +581,7 @@ export default function MainScreen({navigation})
                 return (
                     
                     <Animated.ScrollView
+                    
                     ref={_scrollView}
                     horizontal
                     scrollEventThrottle={1}
@@ -318,25 +595,27 @@ export default function MainScreen({navigation})
                         {
                             mList.map((mLst,index) => (
                                 <View style={styles.card} key={index}>
-                                    <View style={{flex:1, justifyContent:"center", alignItems:"center"}}>
+                                    <View style={{flex:1, justifyContent:"center",marginLeft: cardWdth * 0.05}}>
                                         <Text numberOfLines={1} style={styles.cardTitle}>{mLst.placeName}</Text>
                                     </View>
                                     <View style={{flex:2}}> 
                                         <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
-                                            <Text style={{color:"grey"}}>Queue Status: </Text>
+                                            <Text style={{color:"white"}}>Queue Status: </Text>
                                             <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
                                         </View>
                                         <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}> 
-                                            <Text style={{color:"grey"}}>Last Updated: </Text>
+                                            <Text style={{color:"white"}}>Last Updated: </Text>
                                             <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
                                         </View>
                                         <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
-                                            <TouchableOpacity onPress={onButtonPress()} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                                            <TouchableOpacity disabled = {true} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
                                                 <Text style={{color:"white"}}>Update Queue Status</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
-
+                                    <TouchableOpacity style={{top: 15,left:cardWdth - 50, position:"absolute", height:40,width:40,alignContent:"center",justifyContent:"center"}}>
+                                        {drawFavBtn(index)}
+                                    </TouchableOpacity>
                                 </View>
                             )
                         )}
@@ -378,45 +657,43 @@ export default function MainScreen({navigation})
         {
             if(mList.length != 0)
             {   
-                if(toFirstCard != 1)
+                let index = Math.floor((value / cardWdth)); 
+                
+                if(index >= mList.length)
                 {
-                    let index = Math.floor((value / cardWdth)); 
-                    
-                    if(index >= mList.length)
-                    {
-                        index = mList.length -1;
-                    }
-                    if(index <= 0)
-                    {
-                        index = 0;
-                    }
-                    
-                    clearTimeout(regionTimeout);
-            
-                    const regionTimeout = setTimeout(() =>
-                    {
-                        if(mapIndex != index)
-                        {
-                            mapIndex = index; 
-                            setSelectedLocationIndex(mapIndex); 
-                            _map.current.animateToRegion(
-                                {
-                                    latitude:mList[mapIndex].placeLocation.latitude,
-                                    longitude: mList[mapIndex].placeLocation.longitude,
-                                    latitudeDelta: 0.006,
-                                    longitudeDelta: 0.007,
-                                },350
-                            )
-                        }
-                    });
+                    index = mList.length -1;
                 }
+                if(index <= 0)
+                {
+                    index = 0;
+                }
+                
+                clearTimeout(regionTimeout);
+        
+                const regionTimeout = setTimeout(() =>
+                {
+                    if(mapIndex != index)
+                    {
+                        mapIndex = index; 
+                        setSelectedLocationIndex(mapIndex); 
+                        _map.current.animateToRegion(
+                            {
+                                latitude:mList[mapIndex].placeLocation.latitude,
+                                longitude: mList[mapIndex].placeLocation.longitude,
+                                latitudeDelta: 0.006,
+                                longitudeDelta: 0.007,
+                            },350
+                        )
+                    }
+                });
+                
             }
     });
 });
     
     const onButtonPress = () => 
     {
-
+        console.log(selectedLocationIndex);
 
     }
 
@@ -474,10 +751,40 @@ export default function MainScreen({navigation})
         }
     }
 
+    //Fix Scrollable Press Problem
+    const createUpdateBtn = () =>
+    {
+        if(mList.length > 0)
+        {
+            return (
+                <View style={{position:"absolute",bottom: 155,left:0,right:0,height:50,overflow:"hidden", width:windowWdth, alignItems:"center"}}>
+                    <TouchableOpacity  style={{borderWidth:5,borderColor:"green",width:(windowWdth*0.8), height:"100%",borderRadius:10}}>
+                    </TouchableOpacity>
+                </View>
+            );
+        }
+    }
+
+    //Fix Scrollable Press Problem
+    const createFavBtn = () =>
+    {
+        if(mList.length > 0)
+        {
+            return (
+                <View style={{position:"absolute",bottom: 275,left: (cardWdth - 30),right:0,height:40,overflow:"hidden", width:40, alignItems:"center"}}>
+                    <TouchableOpacity style={{borderWidth:1,borderColor:"green",width:"100%", height:"100%",borderRadius:10}}>
+                    </TouchableOpacity>
+                </View>
+            );
+        }
+    }
+
     return (
     <View style={styles.container}>
         {whileLoading()}
         {drawCardScrollList()}
+        {/* {createUpdateBtn()}
+        {createFavBtn()} */}
     </View>
     );
 }
@@ -559,6 +866,7 @@ const styles = StyleSheet.create({
         padding:10,
     },
     cardTitle: {
+        fontWeight: "bold",
         justifyContent:"center",
         fontSize: 24,
         color: "#F95F6B",

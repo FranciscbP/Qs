@@ -114,7 +114,7 @@ export default function UserScreen({navigation})
 
     <View style={styles.container}>
         <Image source={Logo} style={styles.logo}></Image>
-        <View style={styles.userContainer}>
+        <View style={styles.mainContainer}>
             <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>User</Text>
             <Text style={{fontSize: 18, color: 'white'}}>Email</Text>
             <TextInput style={{borderBottomWidth:1, marginBottom:"2%"}} value={user.email} editable={false} selectTextOnFocus={false} />
@@ -167,14 +167,6 @@ const styles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center'
     },
-    mainContainer:
-    {
-        flex: 8.5,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        backgroundColor: 'rgb(82,82,82)',
-        width:'100%'
-    },
     logo:
     {
         tintColor:'#F95F6B',
@@ -207,7 +199,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         
     },
-    userContainer:
+    mainContainer:
     {
         width: '90%',
         height: '70%',
