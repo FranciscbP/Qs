@@ -21,6 +21,8 @@ export default function MainScreen({navigation})
 
     const [selectedLocationIndex,setSelectedLocationIndex] = useState(0);
 
+    const [toFirstCard,setToFirstCard] = useState(0);
+
     //Reload Screen
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -228,6 +230,50 @@ export default function MainScreen({navigation})
         .then(()=>{setLoadMarkers(false)}); 
     }
 
+    const showMarker = (index) =>
+    {
+        if(mList[index].placeStatus == "Not Busy")
+        {
+            return(
+                <Animated.Image 
+                source={require('../assets/marker-notBusy.png')}
+                resizeMode="cover"
+                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+            />
+            )
+        }
+        else if(mList[index].placeStatus == "Busy")
+        {
+            return(
+                <Animated.Image 
+                source={require('../assets/marker-busy.png')}
+                resizeMode="cover"
+                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+            />
+            )
+        }
+        else if(mList[index].placeStatus == "Very Busy")
+        {
+            return(
+                <Animated.Image 
+                source={require('../assets/marker-veryBusy.png')}
+                resizeMode="cover"
+                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+            />
+            )
+        }
+        else if (mList[index].placeStatus == "No Status")
+        {
+            return(
+                <Animated.Image 
+                source={require('../assets/marker-noStatus.png')}
+                resizeMode="cover"
+                style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
+            />
+            )
+        }
+    }
+
     const drawMarkers = () =>
     {
         if (mList.length > 0)
@@ -242,16 +288,11 @@ export default function MainScreen({navigation})
                     zIndex={selectedLocationIndex == index ? 999 : 0}
                     onPress={(e) => onMarkerPress(e)}
                     >
-                        <Animated.View style={{alignItems:"center", justifyContent:"center",width:50,height:50,}}>
-                            <Animated.Image 
-                                source={require('../assets/marker.png')}
-                                resizeMode="cover"
-                                style={{maxHeight: selectedLocationIndex === index ? 40:30, maxWidth: selectedLocationIndex === index ? 40 : 30 ,tintColor:mLst.placeStatusColor}}
-                            />
+                        <Animated.View style={{alignItems:"center", justifyContent:"center",width:40,height:40,}}>
+                            {showMarker(index)}
                         </Animated.View>
                     </Marker>  
             );
-            
         }
     }
 
@@ -290,7 +331,7 @@ export default function MainScreen({navigation})
                                             <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
                                         </View>
                                         <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
-                                            <TouchableOpacity  style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                                            <TouchableOpacity onPress={onButtonPress()} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
                                                 <Text style={{color:"white"}}>Update Queue Status</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -299,20 +340,20 @@ export default function MainScreen({navigation})
                                 </View>
                             )
                         )}
-
                     </Animated.ScrollView>                    
                 )
             }
         }
-  
     }
 
     const onMarkerPress = (mapEventData) =>
     {
-        const markerID = mapEventData._targetInst.return.key;
-
+        const markerID = mapEventData._targetInst.return.index;
         let x = (markerID * windowWdth);
-        _scrollView.current.scrollTo({x: x, y:0, animated: true})
+
+        _scrollView.current.scrollTo({x: x, y:0, animated: false});
+                
+        setSelectedLocationIndex(markerID);
     }
 
     const onScroll = () =>
@@ -337,42 +378,48 @@ export default function MainScreen({navigation})
         {
             if(mList.length != 0)
             {   
-                let index = Math.floor((value / cardWdth) + 0.3); 
-                if(index >= mList.length)
+                if(toFirstCard != 1)
                 {
-                    index = mList.length -1;
-                }
-                if(index <= 0)
-                {
-                    index = 0;
-                }
-                
-                {
-                    index = index;
-                }
-            
-                clearTimeout(regionTimeout);
-        
-                const regionTimeout = setTimeout(() =>
-                {
-                    if(mapIndex != index)
+                    let index = Math.floor((value / cardWdth)); 
+                    
+                    if(index >= mList.length)
                     {
-                        mapIndex = index; 
-                        setSelectedLocationIndex(mapIndex); 
-                        _map.current.animateToRegion(
-                            {
-                                latitude:mList[index].placeLocation.latitude,
-                                longitude: mList[index].placeLocation.longitude,
-                                latitudeDelta: 0.006,
-                                longitudeDelta: 0.007,
-                            },550
-                        )
+                        index = mList.length -1;
                     }
-                });
+                    if(index <= 0)
+                    {
+                        index = 0;
+                    }
+                    
+                    clearTimeout(regionTimeout);
+            
+                    const regionTimeout = setTimeout(() =>
+                    {
+                        if(mapIndex != index)
+                        {
+                            mapIndex = index; 
+                            setSelectedLocationIndex(mapIndex); 
+                            _map.current.animateToRegion(
+                                {
+                                    latitude:mList[mapIndex].placeLocation.latitude,
+                                    longitude: mList[mapIndex].placeLocation.longitude,
+                                    latitudeDelta: 0.006,
+                                    longitudeDelta: 0.007,
+                                },350
+                            )
+                        }
+                    });
+                }
             }
     });
 });
     
+    const onButtonPress = () => 
+    {
+
+
+    }
+
     const whileLoading = () =>
     {
         if(loadMarkers)
