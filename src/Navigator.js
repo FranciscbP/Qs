@@ -111,7 +111,7 @@ export default function StackNavigator()
             <Stack.Screen name={signIn} component={SignInScreen} options={{ headerShown: false }}/>
             <Stack.Screen name={signUp} component={SignUpScreen} options={{ headerShown: false }}/>
             <Stack.Screen name={placeScreen} component={PlaceScreen} options={{ headerShown: false }} />
-            <Stack.Screen name={mainScreen} component={BottomNavigator} options={{ headerShown: false }}/>
+            <Stack.Screen name={mainScreen} component={BottomNavigator} options={{ headerShown: false}}/>
         </Stack.Navigator>
     )
 }

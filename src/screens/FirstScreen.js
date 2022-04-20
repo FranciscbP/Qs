@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     },
     logo:
     {
+        tintColor: "#F95F6B",
         maxWidth:400,
         maxHeight:400,
     },

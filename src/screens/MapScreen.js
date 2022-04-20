@@ -27,7 +27,7 @@ export default function MainScreen({navigation})
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setLoadMarkers(true);
-            setSelectedLocationIndex(0);
+            // setSelectedLocationIndex(0);
         });
         return unsubscribe;
       }, [navigation]);
@@ -47,22 +47,6 @@ export default function MainScreen({navigation})
 
     const _map = React.useRef(null);
     const _scrollView = React.useRef(null);
-
-    const checkIsFavourite = (placeId) =>
-    {
-        let isFavourite = false;
-
-        favouritsList.map((fList) =>
-        { 
-            if(fList.placeId == placeId)
-            {
-                isFavourite = true;
-            }
-        });
-
-
-        return isFavourite;
-    }
 
     const getMarkers = async() =>
     {
@@ -101,107 +85,43 @@ export default function MainScreen({navigation})
 
                 if(placeStatus == "Not Busy")
                 {   
-                   const checkIfFavourite = checkIsFavourite(placeId)
-                   if(checkIfFavourite)
-                   {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NotBusyColor,
-                            placeIsFavouriteColor: FavouriteColor,
-                        });
-                   }
-                   else
-                   {
                     markersList.push({
                         placeId: placeId,
                         placeName: placeName,
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: NotBusyColor,
-                        placeIsFavouriteColor: NoFavouriteColor,
                     });
-                   }
                 }
                 else if(placeStatus == "Busy")
                 {
-                    const checkIfFavourite = checkIsFavourite(placeId)
-                    if(checkIfFavourite)
-                    {
-                         markersList.push({
-                             placeId: placeId,
-                             placeName: placeName,
-                             placeLocation: placeLocation,
-                             placeStatus: placeStatus,
-                             placeStatusColor: BusyColor,
-                             placeIsFavouriteColor: FavouriteColor,
-                         });
-                    }
-                    else
-                    {
-                     markersList.push({
-                         placeId: placeId,
-                         placeName: placeName,
-                         placeLocation: placeLocation,
-                         placeStatus: placeStatus,
-                         placeStatusColor: BusyColor,
-                         placeIsFavouriteColor: NoFavouriteColor,
-                     });
-                    }
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: BusyColor,
+                    });
                 }
                 else if(placeStatus == "Very Busy")
                 {
-                    const checkIfFavourite = checkIsFavourite(placeId)
-                    if(checkIfFavourite)
-                    {
-                         markersList.push({
-                             placeId: placeId,
-                             placeName: placeName,
-                             placeLocation: placeLocation,
-                             placeStatus: placeStatus,
-                             placeStatusColor: VeryBusyColor,
-                             placeIsFavouriteColor: FavouriteColor,
-                         });
-                    }
-                    else
-                    {
-                     markersList.push({
-                         placeId: placeId,
-                         placeName: placeName,
-                         placeLocation: placeLocation,
-                         placeStatus: placeStatus,
-                         placeStatusColor: VeryBusyColor,
-                         placeIsFavouriteColor: NoFavouriteColor,
-                     });
-                    }
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: VeryBusyColor,
+                    });
                 }
                 else if (placeStatus == "No Status")
                 {
-                    const checkIfFavourite = checkIsFavourite(placeId)
-                    if(checkIfFavourite)
-                    {
-                         markersList.push({
-                             placeId: placeId,
-                             placeName: placeName,
-                             placeLocation: placeLocation,
-                             placeStatus: placeStatus,
-                             placeStatusColor: NoStatusColor,
-                             placeIsFavouriteColor: FavouriteColor,
-                         });
-                    }
-                    else
-                    {
-                     markersList.push({
-                         placeId: placeId,
-                         placeName: placeName,
-                         placeLocation: placeLocation,
-                         placeStatus: placeStatus,
-                         placeStatusColor: NoStatusColor,
-                         placeIsFavouriteColor: NoFavouriteColor,
-                     });
-                    }
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: NoStatusColor,
+                    });
                 }
             });
         }
@@ -232,107 +152,43 @@ export default function MainScreen({navigation})
     
                     if(placeStatus == "Not Busy")
                     {   
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                                markersList.push({
-                                    placeId: placeId,
-                                    placeName: placeName,
-                                    placeLocation: placeLocation,
-                                    placeStatus: placeStatus,
-                                    placeStatusColor: NotBusyColor,
-                                    placeIsFavouriteColor: FavouriteColor,
-                                });
-                        }
-                        else
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: NotBusyColor,
-                                placeIsFavouriteColor: NoFavouriteColor,
-                            });
-                        }
+                        markersList.push({
+                            placeId: placeId,
+                            placeName: placeName,
+                            placeLocation: placeLocation,
+                            placeStatus: placeStatus,
+                            placeStatusColor: NotBusyColor,
+                        });
                     }
                     else if(placeStatus == "Busy")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: BusyColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                     else if(placeStatus == "Very Busy")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: VeryBusyColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                     else if (placeStatus == "No Status")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: NoStatusColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                 });
         }
@@ -363,108 +219,43 @@ export default function MainScreen({navigation})
     
                     if(placeStatus == "Not Busy")
                     {   
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                                markersList.push({
-                                    placeId: placeId,
-                                    placeName: placeName,
-                                    placeLocation: placeLocation,
-                                    placeStatus: placeStatus,
-                                    placeStatusColor: NotBusyColor,
-                                    placeIsFavouriteColor: FavouriteColor,
-                                });
-                        }
-                        else
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: NotBusyColor,
-                                placeIsFavouriteColor: NoFavouriteColor,
-                            });
-                        }
+                        markersList.push({
+                            placeId: placeId,
+                            placeName: placeName,
+                            placeLocation: placeLocation,
+                            placeStatus: placeStatus,
+                            placeStatusColor: NotBusyColor,
+                        });
                     }
                     else if(placeStatus == "Busy")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: BusyColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                     else if(placeStatus == "Very Busy")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: VeryBusyColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                     else if (placeStatus == "No Status")
                     {
-                        const checkIfFavourite = checkIsFavourite(placeId)
-                        if(checkIfFavourite)
-                        {
-                            markersList.push({
-                                placeId: placeId,
-                                placeName: placeName,
-                                placeLocation: placeLocation,
-                                placeStatus: placeStatus,
-                                placeStatusColor: NoStatusColor,
-                                placeIsFavouriteColor: FavouriteColor,
-                                //asdada
-                            });
-                        }
-                        else
-                        {
                         markersList.push({
                             placeId: placeId,
                             placeName: placeName,
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
-                            placeIsFavouriteColor: NoFavouriteColor,
                         });
-                        }
                     }
                 });
         }
@@ -475,8 +266,20 @@ export default function MainScreen({navigation})
 
     if (loadMarkers)
     {
-        getMarkers().then(data => {setMList(data)})
-        .then(()=>{setLoadMarkers(false)}); 
+        getMarkers()
+        .then(data => 
+        {    
+            if(selectedLocationIndex >= data.length)
+            {
+                setSelectedLocationIndex(0);
+                setMList(data);
+            }
+            else
+            {
+                setMList(data);
+            }
+        })
+        .then(()=>{setLoadMarkers(false)}).then(() => _scrollView.current.scrollToOffset({ animated: false, offset: (selectedLocationIndex * windowWdth) })); 
     }
 
     const drawMarkers = () =>
@@ -488,7 +291,6 @@ export default function MainScreen({navigation})
                     key={index}
                     coordinate={{latitude: mLst.placeLocation.latitude,longitude: mLst.placeLocation.longitude}}
                     pinColor={mLst.placeStatusColor}
-
                     zIndex={selectedLocationIndex == index ? 999 : 0}
                     onPress={(e) => onMarkerPress(e)}
                     >
@@ -499,29 +301,13 @@ export default function MainScreen({navigation})
             );
         }
     }
-
-    const onFavBtnPress = (item) =>
-    {
-        console.log(item.placeId);
-    }
-    
+        
     const renderCard = (item) =>
-    {
+    {   
         return(
             <View style={styles.card}>
-                <View style={{flex:1,alignItems:"center", flexDirection:"row",marginLeft: cardWdth * 0.05,width:cardWdth*0.9}}>
-                    <View style={{flex:5,justifyContent:"flex-start"}}>
-                        <Text style={styles.cardTitle}>{item.placeName}</Text>
-                    </View>
-                    
-                    <TouchableOpacity onPress={() => {onFavBtnPress(item)}} style={{flex:1,marginTop:5, alignItems:"center"}}>
-                        <Image
-                            source={require('../assets/heart.png')}
-                            resizeMode="cover"
-                            style={{tintColor: item.placeIsFavouriteColor,width:40,height:40}}
-                        />
-                    </TouchableOpacity>
-                    
+                <View style={{flex:1,alignItems:"center",justifyContent:"center", flexDirection:"row",marginLeft: cardWdth * 0.05,width:cardWdth*0.9}}>
+                    <Text style={styles.cardTitle}>{item.placeName}</Text>
                 </View>
                 <View style={{flex:2}}> 
                     <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
@@ -533,8 +319,8 @@ export default function MainScreen({navigation})
                         <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
                     </View>
                     <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
-                        <TouchableOpacity onPress={() => {onFavBtnPress(item)}} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                            <Text style={{color:"white"}}>Update Queue Status</Text>
+                        <TouchableOpacity onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { place: item},});}} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                            <Text style={{color:"white"}}>Open</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -602,8 +388,8 @@ export default function MainScreen({navigation})
                 {
                     if(mapIndex != index)
                     {
-                        mapIndex = index; 
-                        setSelectedLocationIndex(mapIndex); 
+                        mapIndex = index;
+                        setSelectedLocationIndex(mapIndex);
                         _map.current.animateToRegion(
                             {
                                 latitude:mList[mapIndex].placeLocation.latitude,
@@ -619,12 +405,6 @@ export default function MainScreen({navigation})
     });
 });
     
-    const onButtonPress = () => 
-    {
-        console.log(selectedLocationIndex);
-
-    }
-
     const whileLoading = () =>
     {
         if(loadMarkers)
@@ -676,34 +456,6 @@ export default function MainScreen({navigation})
                     </MapView>
                )
             }
-        }
-    }
-
-    //Fix Scrollable Press Problem
-    const createUpdateBtn = () =>
-    {
-        if(mList.length > 0)
-        {
-            return (
-                <View style={{position:"absolute",bottom: 155,left:0,right:0,height:50,overflow:"hidden", width:windowWdth, alignItems:"center"}}>
-                    <TouchableOpacity  style={{borderWidth:5,borderColor:"green",width:(windowWdth*0.8), height:"100%",borderRadius:10}}>
-                    </TouchableOpacity>
-                </View>
-            );
-        }
-    }
-
-    //Fix Scrollable Press Problem
-    const createFavBtn = () =>
-    {
-        if(mList.length > 0)
-        {
-            return (
-                <View style={{position:"absolute",bottom: 275,left: (cardWdth - 30),right:0,height:40,overflow:"hidden", width:40, alignItems:"center"}}>
-                    <TouchableOpacity style={{borderWidth:1,borderColor:"green",width:"100%", height:"100%",borderRadius:10}}>
-                    </TouchableOpacity>
-                </View>
-            );
         }
     }
 
@@ -797,7 +549,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         justifyContent:"center",
         fontSize: 24,
-        color: "white",
+        color: "#F95F6B",
     },
     cardDescription: {
         fontSize:14,

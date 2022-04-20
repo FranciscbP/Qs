@@ -140,7 +140,7 @@ export default function Favourites({navigation})
       {
           return(
           <View>
-              <TouchableOpacity style={styles.itemBox} onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { placeName: item.placeName},});}}>
+              <TouchableOpacity style={styles.itemBox} onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { place: item},});}}>
                   <Text style={{fontWeight: "bold",justifyContent:"center",fontSize: 20,color: "white", marginLeft:cardWdth *0.05 ,marginTop:10, marginBottom:10}}>{item.placeName}</Text>
                   {renderCardStatus(item)}
                   {renderCardLastUpdated(item)}
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         borderWidth: 1,
         borderColor: 'grey',
-        backgroundColor: 'rgb(97,97,97)',
+        backgroundColor: "rgb(70,70,70)",
         borderRadius: 10,
     },
 })
