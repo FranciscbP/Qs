@@ -479,50 +479,6 @@ export default function MainScreen({navigation})
         .then(()=>{setLoadMarkers(false)}); 
     }
 
-    // const showMarker = (index) =>
-    // {
-    //     if(mList[index].placeStatus == "Not Busy")
-    //     {
-    //         return(
-    //             <Animated.Image 
-    //             source={require('../assets/map_marker.png')}
-    //             resizeMode="cover"
-    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-    //         />
-    //         )
-    //     }
-    //     else if(mList[index].placeStatus == "Busy")
-    //     {
-    //         return(
-    //             <Animated.Image 
-    //             source={require('../assets/map_marker.png')}
-    //             resizeMode="cover"
-    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-    //         />
-    //         )
-    //     }
-    //     else if(mList[index].placeStatus == "Very Busy")
-    //     {
-    //         return(
-    //             <Animated.Image 
-    //             source={require('../assets/map_marker.png')}
-    //             resizeMode="cover"
-    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-    //         />
-    //         )
-    //     }
-    //     else if (mList[index].placeStatus == "No Status")
-    //     {
-    //         return(
-    //             <Animated.Image 
-    //             source={require('../assets/map_marker.png')}
-    //             resizeMode="contain"
-    //             style={{maxHeight: index === selectedLocationIndex ? 40 : 30, maxWidth: index === selectedLocationIndex ? 40 : 30}}
-    //         />
-    //         )
-    //     }
-    // }
-
     const drawMarkers = () =>
     {
         if (mList.length > 0)
@@ -597,65 +553,13 @@ export default function MainScreen({navigation})
         }
     }
 
-    const drawCardScrollList = () =>
-    {
-        if(!loadMarkers)
-        {   
-            if (mList.length > 0)
-            {
-                return (
-                    
-                    <Animated.ScrollView
-                    ref={_scrollView}
-                    horizontal
-                    scrollEventThrottle={1}
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.scrollView}    
-                    pagingEnabled
-                    snapToInterval={windowWdth}
-                    snapToAlignment="center"
-                    onScroll={onScroll()}
-                    >
-                        {
-                            mList.map((mLst,index) => (
-                                <View style={styles.card} key={index}>
-                                    <View style={{flex:1, justifyContent:"center",marginLeft: cardWdth * 0.05}}>
-                                        <Text numberOfLines={1} style={styles.cardTitle}>{mLst.placeName}</Text>
-                                    </View>
-                                    <View style={{flex:2}}> 
-                                        <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
-                                            <Text style={{color:"white"}}>Queue Status: </Text>
-                                            <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
-                                        </View>
-                                        <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}> 
-                                            <Text style={{color:"white"}}>Last Updated: </Text>
-                                            <Text numberOfLines={1} style={{fontSize:14,color:mLst.placeStatusColor, marginLeft:0}}>{mLst.placeStatus}</Text>
-                                        </View>
-                                        <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
-                                            <TouchableOpacity disabled = {true} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                                                <Text style={{color:"white"}}>Update Queue Status</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                    <TouchableOpacity style={{top: 15,left:cardWdth - 50, position:"absolute", height:40,width:40,alignContent:"center",justifyContent:"center"}}>
-                                        {drawFavBtn(index)}
-                                    </TouchableOpacity>
-                                </View>
-                            )
-                        )}
-                    </Animated.ScrollView>                    
-                )
-            }
-        }
-    }
-
     const onMarkerPress = (mapEventData) =>
     {
         const markerID = mapEventData._targetInst.return.index;
         let x = (markerID * windowWdth);
 
-        //_scrollView.current.scrollTo({index:markerID, animated: false});
-                
+        _scrollView.current.scrollToOffset({ animated: false, offset: x });
+
         setSelectedLocationIndex(markerID);
     }
 
