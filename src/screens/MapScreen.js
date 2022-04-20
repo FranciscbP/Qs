@@ -6,7 +6,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 
-
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
@@ -38,6 +37,10 @@ export default function MainScreen({navigation})
     const BusyColor = "yellow";
     const NotBusyColor ="green";
     const NoStatusColor = "orange";
+
+    //Marker Favourtie Colours
+    const FavouriteColor = "#F95F6B";
+    const NoFavouriteColor = "white";
 
     let mapAnimation = new Animated.Value(0);
     let mapIndex = 0;
@@ -107,7 +110,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NotBusyColor,
-                            placeIsFavourite: true,
+                            placeIsFavouriteColor: FavouriteColor,
                         });
                    }
                    else
@@ -118,7 +121,7 @@ export default function MainScreen({navigation})
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: NotBusyColor,
-                        placeIsFavourite: false,
+                        placeIsFavouriteColor: NoFavouriteColor,
                     });
                    }
                 }
@@ -133,7 +136,7 @@ export default function MainScreen({navigation})
                              placeLocation: placeLocation,
                              placeStatus: placeStatus,
                              placeStatusColor: BusyColor,
-                             placeIsFavourite: true,
+                             placeIsFavouriteColor: FavouriteColor,
                          });
                     }
                     else
@@ -144,7 +147,7 @@ export default function MainScreen({navigation})
                          placeLocation: placeLocation,
                          placeStatus: placeStatus,
                          placeStatusColor: BusyColor,
-                         placeIsFavourite: false,
+                         placeIsFavouriteColor: NoFavouriteColor,
                      });
                     }
                 }
@@ -159,7 +162,7 @@ export default function MainScreen({navigation})
                              placeLocation: placeLocation,
                              placeStatus: placeStatus,
                              placeStatusColor: VeryBusyColor,
-                             placeIsFavourite: true,
+                             placeIsFavouriteColor: FavouriteColor,
                          });
                     }
                     else
@@ -170,7 +173,7 @@ export default function MainScreen({navigation})
                          placeLocation: placeLocation,
                          placeStatus: placeStatus,
                          placeStatusColor: VeryBusyColor,
-                         placeIsFavourite: false,
+                         placeIsFavouriteColor: NoFavouriteColor,
                      });
                     }
                 }
@@ -185,7 +188,7 @@ export default function MainScreen({navigation})
                              placeLocation: placeLocation,
                              placeStatus: placeStatus,
                              placeStatusColor: NoStatusColor,
-                             placeIsFavourite: true,
+                             placeIsFavouriteColor: FavouriteColor,
                          });
                     }
                     else
@@ -196,7 +199,7 @@ export default function MainScreen({navigation})
                          placeLocation: placeLocation,
                          placeStatus: placeStatus,
                          placeStatusColor: NoStatusColor,
-                         placeIsFavourite: false,
+                         placeIsFavouriteColor: NoFavouriteColor,
                      });
                     }
                 }
@@ -238,7 +241,7 @@ export default function MainScreen({navigation})
                                     placeLocation: placeLocation,
                                     placeStatus: placeStatus,
                                     placeStatusColor: NotBusyColor,
-                                    placeIsFavourite: true,
+                                    placeIsFavouriteColor: FavouriteColor,
                                 });
                         }
                         else
@@ -249,7 +252,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: NotBusyColor,
-                                placeIsFavourite: false,
+                                placeIsFavouriteColor: NoFavouriteColor,
                             });
                         }
                     }
@@ -264,7 +267,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: BusyColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
                             });
                         }
                         else
@@ -275,7 +278,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -290,7 +293,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: VeryBusyColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
                             });
                         }
                         else
@@ -301,7 +304,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -316,7 +319,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: NoStatusColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
                             });
                         }
                         else
@@ -327,7 +330,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -369,7 +372,7 @@ export default function MainScreen({navigation})
                                     placeLocation: placeLocation,
                                     placeStatus: placeStatus,
                                     placeStatusColor: NotBusyColor,
-                                    placeIsFavourite: true,
+                                    placeIsFavouriteColor: FavouriteColor,
                                 });
                         }
                         else
@@ -380,7 +383,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: NotBusyColor,
-                                placeIsFavourite: false,
+                                placeIsFavouriteColor: NoFavouriteColor,
                             });
                         }
                     }
@@ -395,7 +398,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: BusyColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
                             });
                         }
                         else
@@ -406,7 +409,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: BusyColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -421,7 +424,7 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: VeryBusyColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
                             });
                         }
                         else
@@ -432,7 +435,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: VeryBusyColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -447,7 +450,8 @@ export default function MainScreen({navigation})
                                 placeLocation: placeLocation,
                                 placeStatus: placeStatus,
                                 placeStatusColor: NoStatusColor,
-                                placeIsFavourite: true,
+                                placeIsFavouriteColor: FavouriteColor,
+                                //asdada
                             });
                         }
                         else
@@ -458,7 +462,7 @@ export default function MainScreen({navigation})
                             placeLocation: placeLocation,
                             placeStatus: placeStatus,
                             placeStatusColor: NoStatusColor,
-                            placeIsFavourite: false,
+                            placeIsFavouriteColor: NoFavouriteColor,
                         });
                         }
                     }
@@ -540,35 +544,56 @@ export default function MainScreen({navigation})
         }
     }
 
-    const onFavBtnPress = (index) =>
+    const onFavBtnPress = (item) =>
     {
-       // console.log(index);
+        console.log(item.placeId);
     }
     
-    const drawFavBtn = (index) =>
+    const renderCard = (item) =>
     {
-        if(mList[index].placeIsFavourite == true)
-        {
-            return (
-                <Image
-                disabled ={true}
-                source={require('../assets/heart.png')}
-                resizeMode="cover"
-                style={{tintColor: "#F95F6B",width:40,height:40}}
-                />
-            )
-        }
-        else
-        {
-            return (
-                <Image
-                disabled ={true}
-                // onPress={onFavBtnPress(index)}
-                source={require('../assets/heart.png')}
-                resizeMode="cover"
-                style={{tintColor: "white",width:40,height:40}}
-                />
-            )
+        return(
+            <View style={styles.card}>
+                <View style={{flex:1,alignItems:"center", flexDirection:"row",marginLeft: cardWdth * 0.05,width:cardWdth*0.9}}>
+                    <View style={{flex:5,justifyContent:"flex-start"}}>
+                        <Text style={styles.cardTitle}>{item.placeName}</Text>
+                    </View>
+                    
+                    <TouchableOpacity onPress={() => {onFavBtnPress(item)}} style={{flex:1,marginTop:5, alignItems:"center"}}>
+                        <Image
+                            source={require('../assets/heart.png')}
+                            resizeMode="cover"
+                            style={{tintColor: item.placeIsFavouriteColor,width:40,height:40}}
+                        />
+                    </TouchableOpacity>
+                    
+                </View>
+                <View style={{flex:2}}> 
+                    <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
+                        <Text style={{color:"white"}}>Queue Status: </Text>
+                        <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
+                    </View>
+                    <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}> 
+                        <Text style={{color:"white"}}>Last Updated: </Text>
+                        <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
+                    </View>
+                    <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
+                        <TouchableOpacity onPress={() => {onFavBtnPress(item)}} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                            <Text style={{color:"white"}}>Update Queue Status</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>      
+          )
+    }
+
+    const drawCardFlatList = () =>
+    {
+        if(!loadMarkers)
+        {   
+            if (mList.length > 0)
+            {
+                return <Animated.FlatList ref={_scrollView} horizontal scrollEventThrottle={1} pagingEnabled snapToInterval={windowWdth} snapToAlignment="center" onScroll={onScroll()} style={styles.scrollView} showsHorizontalScrollIndicator={false} data={mList} renderItem={({item}) => renderCard(item)} keyExtractor={item => item.placeId}/>
+            }
         }
     }
 
@@ -581,7 +606,6 @@ export default function MainScreen({navigation})
                 return (
                     
                     <Animated.ScrollView
-                    
                     ref={_scrollView}
                     horizontal
                     scrollEventThrottle={1}
@@ -630,7 +654,7 @@ export default function MainScreen({navigation})
         const markerID = mapEventData._targetInst.return.index;
         let x = (markerID * windowWdth);
 
-        _scrollView.current.scrollTo({x: x, y:0, animated: false});
+        //_scrollView.current.scrollTo({index:markerID, animated: false});
                 
         setSelectedLocationIndex(markerID);
     }
@@ -782,7 +806,7 @@ export default function MainScreen({navigation})
     return (
     <View style={styles.container}>
         {whileLoading()}
-        {drawCardScrollList()}
+        {drawCardFlatList()}
         {/* {createUpdateBtn()}
         {createFavBtn()} */}
     </View>
@@ -869,7 +893,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         justifyContent:"center",
         fontSize: 24,
-        color: "#F95F6B",
+        color: "white",
     },
     cardDescription: {
         fontSize:14,

@@ -11,6 +11,7 @@ import SignUpScreen from "./screens/SignUp";
 import FavouritesScreen from "./screens/FavouritesScreen"
 import MapScreen from "./screens/MapScreen";
 import UserScreen from "./screens/UserScreen";
+import PlaceScreen from "./screens/PlaceScreen";
 
 // Icons
 import heartIcon from "./assets/heart.png"
@@ -26,6 +27,7 @@ const mainScreen = 'MainScreen';
 const favouritesScreen = 'FavouritesScreen';
 const mapScreen = 'mapScreen';
 const settingsScreen = 'SettingsScreen';
+const placeScreen = "PlaceScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -108,6 +110,7 @@ export default function StackNavigator()
             <Stack.Screen name={firstScreen} component={FirstScreen} options={{ headerShown: false }}/>
             <Stack.Screen name={signIn} component={SignInScreen} options={{ headerShown: false }}/>
             <Stack.Screen name={signUp} component={SignUpScreen} options={{ headerShown: false }}/>
+            <Stack.Screen name={placeScreen} component={PlaceScreen} options={{ headerShown: false }} />
             <Stack.Screen name={mainScreen} component={BottomNavigator} options={{ headerShown: false }}/>
         </Stack.Navigator>
     )

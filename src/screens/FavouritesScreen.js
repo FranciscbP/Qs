@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View,Image, StyleSheet, Text, FlatList, Dimensions} from 'react-native'
+import { View,Image, StyleSheet, Text, FlatList, Dimensions,TouchableOpacity} from 'react-native'
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
@@ -140,15 +139,15 @@ export default function Favourites({navigation})
       const renderItem = (item) => 
       {
           return(
-          <View >
-              <TouchableOpacity style={styles.itemBox}>
+          <View>
+              <TouchableOpacity style={styles.itemBox} onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { placeName: item.placeName},});}}>
                   <Text style={{fontWeight: "bold",justifyContent:"center",fontSize: 20,color: "white", marginLeft:cardWdth *0.05 ,marginTop:10, marginBottom:10}}>{item.placeName}</Text>
                   {renderCardStatus(item)}
                   {renderCardLastUpdated(item)}
               </TouchableOpacity>
-          </View>
-          
-      )};
+          </View>      
+        )
+    };
 
       const whileLoading = () =>
       {
@@ -158,7 +157,7 @@ export default function Favourites({navigation})
           }
           else
           {  
-            return <FlatList showsVerticalScrollIndicator={false} data={favouritePlacesList} renderItem={({item}) => renderItem(item)} keyExtractor={item => item.placeId} key={item => item.placeId}  />          
+            return <FlatList showsVerticalScrollIndicator={false} data={favouritePlacesList} renderItem={({item}) => renderItem(item)} keyExtractor={item => item.placeId}/>          
           }
       }
 
