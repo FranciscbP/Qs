@@ -505,7 +505,7 @@ export default function Place({route,navigation,stat})
                         </View>
                     </View>
                     <View style={{alignItems:"center", flex:1, justifyContent:"flex-end",marginBottom:30}}>
-                        <View style={{marginTop:20,alignItems:"center",borderRadius: 10,overflow:"hidden",borderColor:"grey",borderWidth:1, width:"80%"}}>
+                        <View style={{marginTop:20,alignItems:"center",borderRadius: 10,overflow:"hidden",borderColor:"grey", width: windowWdth * 0.9}}>
                             <Picker
                                 selectedValue={selectedValue}
                                 style={{width: "100%", height: 50,backgroundColor: "grey",justifyContent:"center", textAlign:"center"}}
@@ -517,7 +517,7 @@ export default function Place({route,navigation,stat})
                             </Picker>
                         </View>
 
-                        <TouchableOpacity onPress={()=> {updateStatus(selectedValue)}} style={{width: "80%", height: 90, marginTop:20,backgroundColor:"#F95F6B",borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                        <TouchableOpacity onPress={()=> {updateStatus(selectedValue)}} style={{width: windowWdth * 0.9, height: 90, marginTop:20,backgroundColor:"#F95F6B",borderRadius: 15,justifyContent:"center", alignItems:"center"}}>
                             <Text style={{color:"white", fontSize:25}}>Send Report</Text>
                         </TouchableOpacity>
                     </View>
