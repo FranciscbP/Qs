@@ -457,7 +457,14 @@ export default function MainScreen({navigation, plce})
                 setMList(data);
             }
         })
-        .then(()=>{setLoadMarkers(false)}).then(() => _scrollView.current.scrollToOffset({ animated: false, offset: (selectedLocationIndex * windowWdth) })); 
+        .then(()=>{setLoadMarkers(false);}).then(() =>
+        {
+            if(selectedLocationIndex != 0)
+            {
+                _scrollView.current.scrollToOffset({ animated: false, offset: (selectedLocationIndex * windowWdth) });
+            }
+            
+        }); 
     }
 
     const drawMarkers = () =>
