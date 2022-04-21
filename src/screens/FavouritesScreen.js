@@ -8,7 +8,7 @@ import firestore from '@react-native-firebase/firestore';
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
-export default function Favourites({navigation})
+export default function Favourites({navigation,plce})
 {
     const navigator = useNavigation();
 
@@ -23,6 +23,18 @@ export default function Favourites({navigation})
     const BusyColor = "yellow";
     const NotBusyColor ="green";
     const NoStatusColor = "orange";
+
+   //Get Data Realtime
+   useEffect(() => {
+    const subscriber = firestore()
+      .collection('Places')
+      .onSnapshot(documentSnapshot => {
+        setLoading(true);
+      });
+
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, [plce]);
 
     //Reload Screen
     useEffect(() => {
@@ -153,7 +165,7 @@ export default function Favourites({navigation})
       {
           if(loading)
           {
-            return <Text style={{alignSelf: 'center'}}>Loading...</Text>;
+            return <Text style={{alignSelf: 'center'}}></Text>;
           }
           else
           {  

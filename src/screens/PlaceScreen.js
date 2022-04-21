@@ -8,7 +8,7 @@ import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
-export default function Place({route,navigation})
+export default function Place({route,navigation,stat})
 {
     const navigator = useNavigation();
     const user = auth().currentUser;
@@ -21,7 +21,10 @@ export default function Place({route,navigation})
     const [isFavourite, setIsFavourite] = useState(false);
     const [location,setLocation] = useState("");
     const [status,setStatus] = useState("");
+    const [lastStatusTime, setLastStatusTime] = useState("");
+    const [numberOfReports,setNumberOfReports] = useState(0);
 
+    //Loads
     const [checkFavourite, setCheckFavourite] = useState(true);
     const [loadLocation, setLoadLocation] = useState(true);
     const [loadStatus, setLoadStatus] = useState(true);
@@ -31,6 +34,66 @@ export default function Place({route,navigation})
     const BusyColor = "#FFEA00";
     const NotBusyColor ="green";
     const NoStatusColor = "orange";
+
+    //Get Data Realtime
+    useEffect(() => {
+        const subscriber = firestore()
+          .collection('Reports')
+          .onSnapshot(documentSnapshot => {
+            getStatus().then((data) => 
+            {
+                if(data.length > 0)
+                {
+                    let averageStatus = 0;
+                    let count = 0;
+
+                    data.map((d) =>{
+                        if(d.status == "Not Busy")
+                        {
+                            count = count + 1;
+                        }
+                        if(d.status == "Busy")
+                        {
+                            count = count + 2;
+                        }
+                        if(d.status == "Very Busy")
+                        {
+                            count = count + 3;
+                        }
+                    });
+                    
+                    averageStatus = Math.round(count / data.length);
+                    
+                    if(averageStatus == 1)
+                    {   
+                        setStatus("Not Busy");
+                    }
+                    if(averageStatus == 2)
+                    {
+                        setStatus("Busy");
+                    }
+                    if(averageStatus == 3)
+                    {
+                        console.log("Not Busy");
+                        setStatus("Very Busy");
+                    }
+
+                    const lastTime = data[0].time;
+
+                    setLastStatusTime(formatDate(lastTime));
+                    setNumberOfReports(data.length);
+                }
+                else
+                {
+                    setStatus("No Status");
+                }
+
+            });
+          });
+    
+        // Stop listening for updates when no longer required
+        return () => subscriber();
+      }, [stat]);
 
     //Reload Screen
     useEffect(() => {
@@ -56,20 +119,6 @@ export default function Place({route,navigation})
         return data;
     }
 
-    const getPlaceStatus = async()=>
-    {
-        let docStatus;
-
-        const placeRef = firestore().collection('Places').doc(placeID);
-        const placeSnapshot = await placeRef.get()
-        .then(documentSnapshot => {
-            docStatus = documentSnapshot.data().Status;
-        });
-        
-        const data = docStatus;   
-        return data;
-    }
-
     const checkIsFavourite = async() =>
     {
         let isFavourite = false;
@@ -90,6 +139,44 @@ export default function Place({route,navigation})
         return isFavourite;
     }
 
+    const getStatus = async() =>
+    {
+        const updatesList = [];
+        const currentHour = new Date();
+        
+        currentHour.setHours(currentHour.getHours()-1);
+
+        const date = firestore.Timestamp.fromDate(currentHour);
+
+        const favRef = firestore().collection('Reports').where('Time',">=",date).where('PlaceID','==', placeID).orderBy('Time','desc');
+        const favSnapshot = await favRef.get();
+
+        favSnapshot.forEach(doc =>
+        {
+            const time = doc.data().Time;
+            const status = doc.data().Status;
+            
+            updatesList.push({
+                time: time.toDate(),
+                status: status,
+            })
+        });
+
+        return updatesList;
+    }
+
+    //https://stackoverflow.com/questions/25275696/javascript-format-date-time
+    const formatDate = (date) =>
+    {
+        var hours = date.getHours();
+        hours = hours < 10 ? '0'+hours : hours;
+        var minutes = date.getMinutes();
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        var strTime = hours + ':' + minutes;
+ 
+        return strTime + "  " + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
+    }
+
     if(loadLocation)
     {
         getPlaceLocation().then((data) => setLocation(data)).then(() => setLoadLocation(false));
@@ -102,7 +189,61 @@ export default function Place({route,navigation})
 
     if(loadStatus)
     {
-        getPlaceStatus().then((data) => setStatus(data)).then(() => setLoadStatus(false));
+        getStatus().then((data) => 
+        {
+            if(data.length > 0)
+            {
+                let averageStatus = 0;
+                let count = 0;
+
+                data.map((d) =>{
+                    if(d.status == "Not Busy")
+                    {
+                        count = count + 1;
+                    }
+                    if(d.status == "Busy")
+                    {
+                        count = count + 2;
+                    }
+                    if(d.status == "Very Busy")
+                    {
+                        count = count + 3;
+                    }
+                });
+                
+                averageStatus = Math.round(count / data.length);
+                
+                if(averageStatus == 1)
+                {   
+                    setStatus("Not Busy");
+                }
+                if(averageStatus == 2)
+                {
+                    setStatus("Busy");
+                }
+                if(averageStatus == 3)
+                {
+                    console.log("Not Busy");
+                    setStatus("Very Busy");
+                }
+
+                const lastTime = data[0].time;
+
+                /////Set Last Report Time In Minutes
+                // const currentHour = new Date(); 
+                // currentHour.setHours(currentHour.getHours());
+                // let difference = Math.abs(lastTime.getTime()-currentHour.getTime());
+                // let resultInMinutes = Math.round(difference / 60000);
+                
+                setLastStatusTime(formatDate(lastTime));
+                setNumberOfReports(data.length);
+            }
+            else
+            {
+                setStatus("No Status");
+            }
+
+        }).then(() => setLoadStatus(false));
     }
 
     const getFavouriteDocToDelete = async (id) =>
@@ -149,17 +290,63 @@ export default function Place({route,navigation})
         }
     }
 
-    const updateStatus = (status) =>
+    const updateStatus = async(status) =>
     {
-        firestore()
-        .collection('Places')
-        .doc(placeID)
-        .update({
-            Status: status,
-        })
-        .then(() => {
-            setLoadStatus(true);
+        const updatesList = [];
+        let currentHour = new Date();
+        
+        currentHour.setHours(currentHour.getHours()-1);
+
+        const date = firestore.Timestamp.fromDate(currentHour);
+
+        const favRef = firestore().collection('Reports').where('Time',">=",date).where('UserID','==', user.uid).where('PlaceID','==', placeID).orderBy('Time','desc');
+        const favSnapshot = await favRef.get();
+
+        favSnapshot.forEach(doc =>
+        {
+            const time = doc.data().Time;
+            
+            updatesList.push({
+                time: time.toDate(),
+            })
         });
+        if(updatesList.length > 0)
+        {
+            const lastTime = updatesList[0].time;
+            currentHour = new Date(); 
+            currentHour.setHours(currentHour.getHours());
+
+            let difference = Math.abs(lastTime.getTime()-currentHour.getTime());
+            let resultInMinutes = Math.round(difference / 60000);
+
+            if(resultInMinutes < 5)
+            {
+                alert("Please wait " + (5-resultInMinutes) + " minutes to send another report!")
+            }
+            else
+            {
+                firestore()
+                .collection('Reports')
+                .add({
+                    PlaceID: placeID,
+                    UserID: user.uid,
+                    Status: status,
+                    Time: firestore.FieldValue.serverTimestamp(),
+                })
+            }
+        }
+        else
+        {
+            firestore()
+            .collection('Reports')
+            .add({
+                PlaceID: placeID,
+                UserID: user.uid,
+                Status: status,
+                Time: firestore.FieldValue.serverTimestamp(),
+            })
+        }
+  
     }
 
     const whileLoading = () =>
@@ -199,6 +386,25 @@ export default function Place({route,navigation})
         }
     }
 
+    const whileLoadingLastStatus = () =>
+    {
+        if(loadStatus)
+        {
+            return <Text style={{flex:1,fontSize:20}}>Loading...</Text>
+        }
+        else
+        {
+            if(status == "No Status")
+            {
+                return <Text style={{flex:1,fontSize:20, color:"white"}}>No Status</Text>
+            }
+            else
+            {
+                return <Text style={{flex:1,fontSize:20, color:"white"}}>{lastStatusTime}</Text>
+            }
+        }
+    }
+
     const whileLoadingQueueStatus = () =>
     {
         if(loadStatus)
@@ -222,6 +428,25 @@ export default function Place({route,navigation})
             if(status == "No Status")
             {
                 return <Text style={{flex:1,fontSize:20, color:NoStatusColor}}>{status}</Text>
+            }
+        }
+    }
+
+    const whileLoadingNumberOfReports = () =>
+    {
+        if(loadStatus)
+        {
+            return <Text style={{flex:1,fontSize:20}}>Loading...</Text>
+        }
+        else
+        {
+            if(status == "No Status")
+            {
+                return <Text style={{flex:1,fontSize:20, color:"white"}}>No Status</Text>
+            }
+            else
+            {
+                return <Text style={{flex:1,fontSize:20, color:"white"}}>{numberOfReports}</Text>
             }
         }
     }
@@ -259,20 +484,28 @@ export default function Place({route,navigation})
                     <View style={{marginTop:10,alignItems:"center"}}>
                         <Text style={styles.pageTitle}>Status</Text>
                     </View>
-                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row"}}>
+                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
                         <Text style={{flex:3,fontSize:18,}}>Queue Status:</Text>
-                        {whileLoadingQueueStatus()}
+                        <View style={{alignItems:"flex-end", marginRight:5}}>
+                            {whileLoadingQueueStatus()}
+                        </View>
+                       
                     </View>
-                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row"}}>
-                        <Text style={{flex:3,fontSize:18,}}>Last Status Update:</Text>
-                        {whileLoadingQueueStatus()}
+                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
+                        <Text style={{flex:3,fontSize:18,}}>Last Report:</Text>
+                        <View style={{alignItems:"flex-end", marginRight:5}}>
+                            {whileLoadingLastStatus()}
+                        </View>
+                        
                     </View>
-                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row"}}>
-                        <Text style={{flex:3,fontSize:18,}}>Accuracy:</Text>
-                        {whileLoadingQueueStatus()}
+                    <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", heigh:30}}>
+                        <Text style={{flex:3,fontSize:18,}}>Last Hour Reports:</Text>
+                        <View style={{alignItems:"flex-end", marginRight:5}}>
+                            {whileLoadingNumberOfReports()}
+                        </View>
                     </View>
                     <View style={{marginTop:20,alignItems:"center"}}>
-                        <Text style={styles.subtitle}>Update Status</Text>
+                        <Text style={styles.subtitle}>Send Status Report</Text>
                     </View>
                     <View style={{marginTop:20,alignItems:"center"}}>
                         <TouchableOpacity onPress={()=> {updateStatus("Not Busy")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:NotBusyColor,borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
@@ -287,11 +520,6 @@ export default function Place({route,navigation})
                     <View style={{marginTop:20,alignItems:"center"}}>
                         <TouchableOpacity onPress={()=> {updateStatus("Very Busy")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:VeryBusyColor,borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
                             <Text style={{color:"white", fontSize:18}}>Very Busy</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{marginTop:20,alignItems:"center"}}>
-                        <TouchableOpacity onPress={()=> {updateStatus("No Status")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:"rgb(60,60,60)",borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                            <Text style={{color:"white", fontSize:18}}>No Status</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

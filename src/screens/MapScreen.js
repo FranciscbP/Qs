@@ -9,7 +9,7 @@ import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
-export default function MainScreen({navigation})
+export default function MainScreen({navigation, plce})
 {
     const navigator = useNavigation();
 
@@ -20,6 +20,7 @@ export default function MainScreen({navigation})
 
     const markersList = [];
     const [mList, setMList] = useState(markersList);
+    // const [drawPins, setDrawPins] = useState(false);
 
     const [selectedLocationIndex,setSelectedLocationIndex] = useState(0);
 
@@ -47,6 +48,19 @@ export default function MainScreen({navigation})
 
     const _map = React.useRef(null);
     const _scrollView = React.useRef(null);
+    const _marker = React.useRef(null);
+
+   //Get Data Realtime
+   useEffect(() => {
+    const subscriber = firestore()
+      .collection('Places')
+      .onSnapshot(documentSnapshot => {
+        setLoadMarkers(true);
+      });
+
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, [plce]);
 
     const getMarkers = async() =>
     {
@@ -288,6 +302,7 @@ export default function MainScreen({navigation})
         {
             return mList.map((mLst,index) =>  
                     <Marker 
+                    ref={_marker}
                     key={index}
                     coordinate={{latitude: mLst.placeLocation.latitude,longitude: mLst.placeLocation.longitude}}
                     pinColor={mLst.placeStatusColor}
@@ -314,11 +329,11 @@ export default function MainScreen({navigation})
                         <Text style={{color:"white"}}>Queue Status: </Text>
                         <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
                     </View>
-                    <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}> 
+                    <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row",marginTop:5}}> 
                         <Text style={{color:"white"}}>Last Updated: </Text>
                         <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
                     </View>
-                    <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:20,}}>
+                    <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:15}}>
                         <TouchableOpacity onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { place: item},});}} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
                             <Text style={{color:"white"}}>Open</Text>
                         </TouchableOpacity>
@@ -408,19 +423,38 @@ export default function MainScreen({navigation})
     const whileLoading = () =>
     {
         if(loadMarkers)
-        {
-           return(
-                <MapView
-                provider={PROVIDER_GOOGLE}
-                style={styles.map}
-                region={{
-                    latitude: 52.95402230,
-                    longitude: -1.15498920,
-                    latitudeDelta: 0.010,
-                    longitudeDelta: 0.0170,
-                }}>
-                </MapView>
-           )
+        {   
+            if (mList.length > 0)
+            {
+                return (
+                    <MapView
+                    ref = {_map}
+                    provider={PROVIDER_GOOGLE}
+                    style={styles.map}
+                    region={{
+                        latitude: mList[selectedLocationIndex].placeLocation.latitude,
+                        longitude: mList[selectedLocationIndex].placeLocation.longitude,
+                        latitudeDelta: 0.006,
+                        longitudeDelta: 0.007,
+                    }}>
+                    </MapView>
+                )
+            }
+            else
+            {
+                return(
+                    <MapView
+                    provider={PROVIDER_GOOGLE}
+                    style={styles.map}
+                    region={{
+                        latitude: 52.95402230,
+                        longitude: -1.15498920,
+                        latitudeDelta: 0.010,
+                        longitudeDelta: 0.0170,
+                    }}>
+                    </MapView>
+               )
+            }
         }
         else
         {
