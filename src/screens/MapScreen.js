@@ -15,12 +15,9 @@ export default function MainScreen({navigation, plce})
 
     const user = auth().currentUser;
     const [loadMarkers, setLoadMarkers] = useState(true);
-    
-    const favouritsList = [];
 
     const markersList = [];
     const [mList, setMList] = useState(markersList);
-    // const [drawPins, setDrawPins] = useState(false);
 
     const [selectedLocationIndex,setSelectedLocationIndex] = useState(0);
 
@@ -28,7 +25,6 @@ export default function MainScreen({navigation, plce})
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setLoadMarkers(true);
-            // setSelectedLocationIndex(0);
         });
         return unsubscribe;
       }, [navigation]);
@@ -53,7 +49,7 @@ export default function MainScreen({navigation, plce})
    //Get Data Realtime
    useEffect(() => {
     const subscriber = firestore()
-      .collection('Places')
+      .collection('Reports')
       .onSnapshot(documentSnapshot => {
         setLoadMarkers(true);
       });
@@ -61,6 +57,90 @@ export default function MainScreen({navigation, plce})
     // Stop listening for updates when no longer required
     return () => subscriber();
   }, [plce]);
+
+    //https://stackoverflow.com/questions/25275696/javascript-format-date-time
+    const formatDate = (date) =>
+    {
+        var hours = date.getHours();
+        hours = hours < 10 ? '0'+hours : hours;
+        var minutes = date.getMinutes();
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        var strTime = hours + ':' + minutes;
+ 
+        return strTime + "  " + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
+    }
+
+      const checkReports = (repList, placeID) =>
+      {
+        let placeReports = [];
+        let PlaceStatusReport = [];
+
+        repList.map((rep) => {
+
+            if(rep.place == placeID)
+            {
+                placeReports.push({
+                    time: rep.time,
+                    status: rep.status,
+                })
+            }
+        });
+
+        if (placeReports.length > 0)
+        {
+            let averageStatus = 0;
+            let count = 0;
+
+            placeReports.map((pR) =>{
+                if(pR.status == "Not Busy")
+                {
+                    count = count + 1;
+                }
+                if(pR.status == "Busy")
+                {
+                    count = count + 2;
+                }
+                if(pR.status == "Very Busy")
+                {
+                    count = count + 3;
+                }
+            });
+            
+            averageStatus = Math.round(count / placeReports.length);
+            const lastTime = placeReports[0].time;
+
+            if(averageStatus == 1)
+            {   
+                PlaceStatusReport.push({
+                    status: "Not Busy",
+                    lastUpdated: formatDate(lastTime),
+                })
+            }
+            if(averageStatus == 2)
+            {
+                PlaceStatusReport.push({
+                    status: "Busy",
+                    lastUpdated: formatDate(lastTime),
+                })
+            }
+            if(averageStatus == 3)
+            {
+                PlaceStatusReport.push({
+                    status: "Very Busy",
+                    lastUpdated: formatDate(lastTime),
+                })
+            }
+        }
+        else
+        {
+            PlaceStatusReport.push({
+                status: "No Status",
+                lastUpdated: "No Status",
+            })
+        }
+        return(PlaceStatusReport)
+
+      }
 
     const getMarkers = async() =>
     {
@@ -73,30 +153,54 @@ export default function MainScreen({navigation, plce})
         const showClubs = userSnapshot.data().showClubs;
         const showRestaurants = userSnapshot.data().showRestaurants;
 
-        const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
-        const favSnapshot = await favRef.get();
-
-        favSnapshot.forEach(doc =>
-        {
-            const favPlaceId = doc.data().PlaceID;
-
-            favouritsList.push({
-                placeId: favPlaceId,
-            })
-        });
-
         if(showBars)
         {
             const bars = firestore().collection('Places').where('Type','==','Bar');
             const barsSnapshot = await bars.get();
         
+            const reportsList = [];
+
+            //Get Reports From Last Hour
+            const currentHour = new Date();
+            currentHour.setHours(currentHour.getHours()-1);
+            const date = firestore.Timestamp.fromDate(currentHour);
+
+            const reportsRef = firestore().collection('Reports').where('Time',">=",date).orderBy('Time','desc');
+            const repSnapshot = await reportsRef.get();
+
+            repSnapshot.forEach(doc =>
+            {
+                const place = doc.data().PlaceID;
+                const time = doc.data().Time;
+                const status = doc.data().Status;
+                
+                reportsList.push({
+                    place: place,
+                    time: time.toDate(),
+                    status: status,
+                })
+            });
+
             barsSnapshot.forEach(doc => 
-            {   
+            {
                 const placeId = doc.id;
                 const placeName = doc.data().Name;
                 const placeLocation = doc.data().Location;
-                const placeStatus = doc.data().Status;
+                let placeStatus;
+                let lastReport;
 
+                if(reportsList.length > 0)
+                {
+                    const checkPlaceReports = checkReports(reportsList,placeId);
+                    placeStatus = checkPlaceReports[0].status;
+                    lastReport = checkPlaceReports[0].lastUpdated;
+                }
+                else
+                {
+                    placeStatus = "No Status";
+                    lastReport = "No Status";
+                }
+                
                 if(placeStatus == "Not Busy")
                 {   
                     markersList.push({
@@ -105,9 +209,10 @@ export default function MainScreen({navigation, plce})
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: NotBusyColor,
+                        placeLastReport: lastReport,
                     });
                 }
-                else if(placeStatus == "Busy")
+                if (placeStatus == "Busy")
                 {
                     markersList.push({
                         placeId: placeId,
@@ -115,9 +220,10 @@ export default function MainScreen({navigation, plce})
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: BusyColor,
+                        placeLastReport: lastReport,
                     });
                 }
-                else if(placeStatus == "Very Busy")
+                if (placeStatus == "Very Busy")
                 {
                     markersList.push({
                         placeId: placeId,
@@ -125,9 +231,10 @@ export default function MainScreen({navigation, plce})
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: VeryBusyColor,
+                        placeLastReport: lastReport,
                     });
                 }
-                else if (placeStatus == "No Status")
+                if (placeStatus == "No Status")
                 {
                     markersList.push({
                         placeId: placeId,
@@ -135,6 +242,7 @@ export default function MainScreen({navigation, plce})
                         placeLocation: placeLocation,
                         placeStatus: placeStatus,
                         placeStatusColor: NoStatusColor,
+                        placeLastReport: lastReport,
                     });
                 }
             });
@@ -145,66 +253,94 @@ export default function MainScreen({navigation, plce})
             const clubs = firestore().collection('Places').where('Type','==','Club');
             const clubsSnapshot = await clubs.get();
 
-            const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
-            const favSnapshot = await favRef.get();
-    
-            favSnapshot.forEach(doc =>
+            const reportsList = [];
+
+            //Get Reports From Last Hour
+            const currentHour = new Date();
+            currentHour.setHours(currentHour.getHours()-1);
+            const date = firestore.Timestamp.fromDate(currentHour);
+
+            const reportsRef = firestore().collection('Reports').where('Time',">=",date).orderBy('Time','desc');
+            const repSnapshot = await reportsRef.get();
+
+            repSnapshot.forEach(doc =>
             {
-                const favPlaceId = doc.data().PlaceID;
-    
-                favouritsList.push({
-                    placeId: favPlaceId,
+                const place = doc.data().PlaceID;
+                const time = doc.data().Time;
+                const status = doc.data().Status;
+                
+                reportsList.push({
+                    place: place,
+                    time: time.toDate(),
+                    status: status,
                 })
             });
 
             clubsSnapshot.forEach(doc => 
+            {
+                const placeId = doc.id;
+                const placeName = doc.data().Name;
+                const placeLocation = doc.data().Location;
+                let placeStatus;
+                let lastReport;
+
+                if(reportsList.length > 0)
+                {
+                    const checkPlaceReports = checkReports(reportsList,placeId);
+                    placeStatus = checkPlaceReports[0].status;
+                    lastReport = checkPlaceReports[0].lastUpdated;
+                }
+                else
+                {
+                    placeStatus = "No Status";
+                    lastReport = "No Status";
+                }
+                
+                if(placeStatus == "Not Busy")
                 {   
-                    const placeId = doc.id;
-                    const placeName = doc.data().Name;
-                    const placeLocation = doc.data().Location;
-                    const placeStatus = doc.data().Status;
-    
-                    if(placeStatus == "Not Busy")
-                    {   
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NotBusyColor,
-                        });
-                    }
-                    else if(placeStatus == "Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: BusyColor,
-                        });
-                    }
-                    else if(placeStatus == "Very Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: VeryBusyColor,
-                        });
-                    }
-                    else if (placeStatus == "No Status")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NoStatusColor,
-                        });
-                    }
-                });
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: NotBusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "Busy")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: BusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "Very Busy")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: VeryBusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "No Status")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: NoStatusColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+            });
         }
 
         if(showRestaurants)
@@ -212,66 +348,94 @@ export default function MainScreen({navigation, plce})
             const restaurants = firestore().collection('Places').where('Type','==','Restaurant');
             const restaurantsSnapshot = await restaurants.get();
 
-            const favRef = firestore().collection('Favourites').where('UserID','==', user.uid);
-            const favSnapshot = await favRef.get();
-    
-            favSnapshot.forEach(doc =>
+            const reportsList = [];
+
+            //Get Reports From Last Hour
+            const currentHour = new Date();
+            currentHour.setHours(currentHour.getHours()-1);
+            const date = firestore.Timestamp.fromDate(currentHour);
+
+            const reportsRef = firestore().collection('Reports').where('Time',">=",date).orderBy('Time','desc');
+            const repSnapshot = await reportsRef.get();
+
+            repSnapshot.forEach(doc =>
             {
-                const favPlaceId = doc.data().PlaceID;
-    
-                favouritsList.push({
-                    placeId: favPlaceId,
+                const place = doc.data().PlaceID;
+                const time = doc.data().Time;
+                const status = doc.data().Status;
+                
+                reportsList.push({
+                    place: place,
+                    time: time.toDate(),
+                    status: status,
                 })
             });
 
             restaurantsSnapshot.forEach(doc => 
+            {
+                const placeId = doc.id;
+                const placeName = doc.data().Name;
+                const placeLocation = doc.data().Location;
+                let placeStatus;
+                let lastReport;
+
+                if(reportsList.length > 0)
+                {
+                    const checkPlaceReports = checkReports(reportsList,placeId);
+                    placeStatus = checkPlaceReports[0].status;
+                    lastReport = checkPlaceReports[0].lastUpdated;
+                }
+                else
+                {
+                    placeStatus = "No Status";
+                    lastReport = "No Status";
+                }
+                
+                if(placeStatus == "Not Busy")
                 {   
-                    const placeId = doc.id;
-                    const placeName = doc.data().Name;
-                    const placeLocation = doc.data().Location;
-                    const placeStatus = doc.data().Status;
-    
-                    if(placeStatus == "Not Busy")
-                    {   
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NotBusyColor,
-                        });
-                    }
-                    else if(placeStatus == "Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: BusyColor,
-                        });
-                    }
-                    else if(placeStatus == "Very Busy")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: VeryBusyColor,
-                        });
-                    }
-                    else if (placeStatus == "No Status")
-                    {
-                        markersList.push({
-                            placeId: placeId,
-                            placeName: placeName,
-                            placeLocation: placeLocation,
-                            placeStatus: placeStatus,
-                            placeStatusColor: NoStatusColor,
-                        });
-                    }
-                });
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: NotBusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "Busy")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: BusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "Very Busy")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: VeryBusyColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+                if (placeStatus == "No Status")
+                {
+                    markersList.push({
+                        placeId: placeId,
+                        placeName: placeName,
+                        placeLocation: placeLocation,
+                        placeStatus: placeStatus,
+                        placeStatusColor: NoStatusColor,
+                        placeLastReport: lastReport,
+                    });
+                }
+            });
         }
         
         const data = markersList;
@@ -326,12 +490,12 @@ export default function MainScreen({navigation, plce})
                 </View>
                 <View style={{flex:2}}> 
                     <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
-                        <Text style={{color:"white"}}>Queue Status: </Text>
+                        <Text style={{color:"rgb(60,60,60)"}}>Queue Status: </Text>
                         <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
                     </View>
                     <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row",marginTop:5}}> 
-                        <Text style={{color:"white"}}>Last Updated: </Text>
-                        <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
+                        <Text style={{color:"rgb(60,60,60)"}}>Last Updated: </Text>
+                        <Text numberOfLines={1} style={{fontSize:14,color: "white", marginLeft:0}}>{item.placeLastReport}</Text>
                     </View>
                     <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:15}}>
                         <TouchableOpacity onPress={() => {navigator.navigate("PlaceScreen",{screen:"PlaceScreen",params: { place: item},});}} style={{width: (cardWdth * 0.9), height: 50,backgroundColor:'#F95F6B',borderRadius: 10,justifyContent:"center", alignItems:"center"}}>

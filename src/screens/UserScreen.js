@@ -24,38 +24,46 @@ export default function UserScreen({navigation})
     const [isBarEnabled, setIsBarEnabled] = useState(false);
     const toggleBarSwitch = () => 
     {
-        setIsBarEnabled(previousState => !previousState);
-        firestore()
-        .collection('Users')
-        .doc(user.uid)
-        .update({
-          showBars: !isBarEnabled,
-        });
-        
+        if(!(!isClubEnabled && !isRestaurantEnabled))
+        {
+            setIsBarEnabled(previousState => !previousState);
+            firestore()
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+              showBars: !isBarEnabled,
+            });
+        }
     }
 
     const [isClubEnabled, setIsClubEnabled] = useState(false);
     const toggleClubSwitch = () => 
     {
-        setIsClubEnabled(previousState => !previousState);
-        firestore()
-        .collection('Users')
-        .doc(user.uid)
-        .update({
-          showClubs: !isClubEnabled,
-        });
+        if(!(!isBarEnabled && !isRestaurantEnabled))
+        {
+            setIsClubEnabled(previousState => !previousState);
+            firestore()
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+              showClubs: !isClubEnabled,
+            });
+        }
     }
 
     const [isRestaurantEnabled, setIsRestaurantEnabled] = useState(false);
     const toggleRestaurantSwitch = () =>     
     {
-        setIsRestaurantEnabled(previousState => !previousState);
-        firestore()
-        .collection('Users')
-        .doc(user.uid)
-        .update({
-          showRestaurants: !isRestaurantEnabled,
-        });
+        if(!(!isBarEnabled && !isClubEnabled))
+        {
+            setIsRestaurantEnabled(previousState => !previousState);
+            firestore()
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+            showRestaurants: !isRestaurantEnabled,
+            });
+        }
     }
 
     const getUserData = async () =>

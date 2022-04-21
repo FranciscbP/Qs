@@ -74,7 +74,6 @@ export default function Place({route,navigation,stat})
                     }
                     if(averageStatus == 3)
                     {
-                        console.log("Not Busy");
                         setStatus("Very Busy");
                     }
 
@@ -223,17 +222,10 @@ export default function Place({route,navigation,stat})
                 }
                 if(averageStatus == 3)
                 {
-                    console.log("Not Busy");
                     setStatus("Very Busy");
                 }
 
                 const lastTime = data[0].time;
-
-                /////Set Last Report Time In Minutes
-                // const currentHour = new Date(); 
-                // currentHour.setHours(currentHour.getHours());
-                // let difference = Math.abs(lastTime.getTime()-currentHour.getTime());
-                // let resultInMinutes = Math.round(difference / 60000);
                 
                 setLastStatusTime(formatDate(lastTime));
                 setNumberOfReports(data.length);
@@ -442,7 +434,7 @@ export default function Place({route,navigation,stat})
         {
             if(status == "No Status")
             {
-                return <Text style={{flex:1,fontSize:20, color:"white"}}>No Status</Text>
+                return <Text style={{flex:1,fontSize:20, color:"white"}}>0</Text>
             }
             else
             {
@@ -485,21 +477,21 @@ export default function Place({route,navigation,stat})
                         <Text style={styles.pageTitle}>Status</Text>
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
-                        <Text style={{flex:3,fontSize:18,}}>Queue Status:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Queue Status:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingQueueStatus()}
                         </View>
                        
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
-                        <Text style={{flex:3,fontSize:18,}}>Last Report:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Last Report:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingLastStatus()}
                         </View>
                         
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", heigh:30}}>
-                        <Text style={{flex:3,fontSize:18,}}>Last Hour Reports:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Last Hour Reports:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingNumberOfReports()}
                         </View>
