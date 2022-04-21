@@ -5,6 +5,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 
+import {Picker} from '@react-native-picker/picker';
+
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
@@ -18,22 +20,24 @@ export default function Place({route,navigation,stat})
     const placeID = place.placeId;
     const placeName = place.placeName;
     
+   //Status Colours
+   const VeryBusyColor = "red";
+   const BusyColor = "yellow";
+   const NotBusyColor ="green";
+   const NoStatusColor = "orange";
+
+    //USeState Variables
     const [isFavourite, setIsFavourite] = useState(false);
     const [location,setLocation] = useState("");
     const [status,setStatus] = useState("");
     const [lastStatusTime, setLastStatusTime] = useState("");
     const [numberOfReports,setNumberOfReports] = useState(0);
+    const [selectedValue, setSelectedValue] = useState("Not Busy");
 
     //Loads
     const [checkFavourite, setCheckFavourite] = useState(true);
     const [loadLocation, setLoadLocation] = useState(true);
     const [loadStatus, setLoadStatus] = useState(true);
-
-    //Status Colours
-    const VeryBusyColor = "red";
-    const BusyColor = "#FFEA00";
-    const NotBusyColor ="green";
-    const NoStatusColor = "orange";
 
     //Get Data Realtime
     useEffect(() => {
@@ -215,14 +219,17 @@ export default function Place({route,navigation,stat})
                 if(averageStatus == 1)
                 {   
                     setStatus("Not Busy");
+                    setSelectedValue("Not Busy");
                 }
                 if(averageStatus == 2)
                 {
                     setStatus("Busy");
+                    setSelectedValue("Busy");
                 }
                 if(averageStatus == 3)
                 {
                     setStatus("Very Busy");
+                    setSelectedValue("Very Busy");
                 }
 
                 const lastTime = data[0].time;
@@ -233,6 +240,7 @@ export default function Place({route,navigation,stat})
             else
             {
                 setStatus("No Status");
+                setSelectedValue("Not Busy");
             }
 
         }).then(() => setLoadStatus(false));
@@ -367,8 +375,8 @@ export default function Place({route,navigation,stat})
                 region={{
                     latitude: location.latitude,
                     longitude: location.longitude,
-                    latitudeDelta: 0.001,
-                    longitudeDelta: 0.001,
+                    latitudeDelta: 0.0008,
+                    longitudeDelta: 0.0008,
                 }}>
                     <Marker 
                         coordinate={{latitude: location.latitude,longitude: location.longitude}}
@@ -496,24 +504,24 @@ export default function Place({route,navigation,stat})
                             {whileLoadingNumberOfReports()}
                         </View>
                     </View>
-                    <View style={{marginTop:20,alignItems:"center"}}>
-                        <Text style={styles.subtitle}>Send Status Report</Text>
-                    </View>
-                    <View style={{marginTop:20,alignItems:"center"}}>
-                        <TouchableOpacity onPress={()=> {updateStatus("Not Busy")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:NotBusyColor,borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                            <Text style={{color:"white", fontSize:18}}>Not Busy</Text>
+                    <View style={{alignItems:"center", flex:1, justifyContent:"flex-end",marginBottom:30}}>
+                        <View style={{marginTop:20,alignItems:"center",borderRadius: 10,overflow:"hidden",borderColor:"grey",borderWidth:1, width:"80%"}}>
+                            <Picker
+                                selectedValue={selectedValue}
+                                style={{width: "100%", height: 50,backgroundColor: "grey",justifyContent:"center", textAlign:"center"}}
+                                onValueChange={(itemValue) => {setSelectedValue(itemValue)}}
+                            >
+                                <Picker.Item label="Not Busy" value="Not Busy"/>
+                                <Picker.Item label="Busy" value="Busy"/>
+                                <Picker.Item label="Very Busy" value="Very Busy"/>
+                            </Picker>
+                        </View>
+
+                        <TouchableOpacity onPress={()=> {updateStatus(selectedValue)}} style={{width: "80%", height: 90, marginTop:20,backgroundColor:"#F95F6B",borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
+                            <Text style={{color:"white", fontSize:25}}>Send Report</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{marginTop:20,alignItems:"center"}}>
-                        <TouchableOpacity  onPress={()=> {updateStatus("Busy")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:BusyColor,borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                            <Text style={{color:"white", fontSize:18}}>Busy</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{marginTop:20,alignItems:"center"}}>
-                        <TouchableOpacity onPress={()=> {updateStatus("Very Busy")}} style={{width: "80%", height: 50,borderColor:"grey", borderWidth:1,backgroundColor:VeryBusyColor,borderRadius: 10,justifyContent:"center", alignItems:"center"}}>
-                            <Text style={{color:"white", fontSize:18}}>Very Busy</Text>
-                        </TouchableOpacity>
-                    </View>
+
                 </View>
             </View>
         </View>
@@ -544,7 +552,7 @@ const styles = StyleSheet.create({
     },
     map: {
         width:'100%',
-        height:"130%",
+        height:"100%",
         overflow:"visible",
       },
     title: {
@@ -556,13 +564,13 @@ const styles = StyleSheet.create({
 
     pageTitle: {
         justifyContent:"center",
-        fontSize: 24,
+        fontSize: 30,
         color: "#F95F6B",
     },
 
     subtitle: {
         justifyContent:"center",
         fontSize: 24,
-        color: "grey",
+        color: "white",
     },
 })

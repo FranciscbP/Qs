@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View,Image, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView,Switch} from 'react-native'
+import { View,Image, StyleSheet, Text, TextInput, TouchableOpacity,Switch,Alert} from 'react-native'
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
@@ -104,7 +104,8 @@ export default function UserScreen({navigation})
         .signOut()
         .then(() => 
         {
-            navigator.navigate("SignInScreen")
+            navigator.popToTop();
+            navigator.navigate("SignInScreen");
         });
     }
 
@@ -112,7 +113,7 @@ export default function UserScreen({navigation})
     {
         auth().sendPasswordResetEmail(user.email)
         .then(function (user) {
-          alert('Reset Email Sent!')
+          Alert.alert('Reset Password','Please Check your Email!');
         }).catch(function (e) {
           console.log(e)
         })

@@ -1,8 +1,10 @@
 import React, {useState, useEffect}  from "react";
-import { View, Text , TextInput, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text , TextInput, Image, StyleSheet, TouchableOpacity,Alert} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
+
+import prompt from 'react-native-prompt-android';
 
 export default function SignIn({navigation})
 {
@@ -37,6 +39,7 @@ export default function SignIn({navigation})
             {
                 setEmail("");
                 setPassword("");
+                navigator.popToTop();
                 navigator.navigate("MainScreen"); 
             })
             .catch(error => {
@@ -61,6 +64,42 @@ export default function SignIn({navigation})
     const onSignUpScreenPressed = () =>
     {
         navigator.navigate("SignUpScreen");    
+    }
+
+    const onForgotPasswdPressed = () =>
+    {
+        prompt(
+            'Forgot Password',
+            'Please enter your Email',
+            [
+             {text: 'Cancel',style: 'cancel'},
+             {text: 'Send Reset Email', onPress: ((email) => {
+                if(email.length > 0)
+                {
+                    auth().sendPasswordResetEmail(email)
+                    .then(() => 
+                    {
+                      Alert.alert('Reset Password','Please Check your Email!');
+                    })
+                    .catch(error => 
+                    {            
+                        if (error.code === 'auth/invalid-email') 
+                        {
+                            Alert.alert('Forgot Password','Email Address is Invalid!');
+                        }
+                    });
+                }
+                else
+                {
+                    onForgotPasswdPressed();
+                }
+             })},
+            ],
+            {
+                cancelable: false,
+                placeholder: 'example@email.com',
+            }
+          );
     }
 
     return (
@@ -88,7 +127,7 @@ export default function SignIn({navigation})
                 */}
 
                 <View style={{flexDirection:'row', marginTop:'10%'}}>
-                    <Text style={{fontSize:16, color:'white'}}>Forgot Password?</Text>
+                    <Text style={{fontSize:16, color:'white'}} onPress={onForgotPasswdPressed}>Forgot Password?</Text>
                     <Text style={{fontSize:16, color:'#F95F6B',flex:1, textAlign:'right'}} onPress={onSignUpScreenPressed}>Sign Up</Text>
                 </View>
             </View>

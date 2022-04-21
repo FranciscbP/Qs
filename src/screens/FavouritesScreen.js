@@ -300,7 +300,8 @@ export default function Favourites({navigation,plce})
     <View style={styles.container}>
         <Image source={Logo} style={styles.logo}></Image>
         <View style={styles.mainContainer}>
-            <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>Favourite Places</Text>
+            {/* <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>Favourite Places</Text> */}
+            <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>Favourites</Text>
             <View style={{width:"100%", height:"70%"}}>
                 {whileLoading()}
             </View>
