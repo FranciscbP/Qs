@@ -6,17 +6,25 @@ import auth from '@react-native-firebase/auth';
 
 export default function FirstScreen({navigation})
 {
+    //Navigate Between Screens
     const navigator = useNavigation();
 
-    //Reload Screen
+    //Come back to initialized Screen
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-          
+            checkUserSigned();
         });
         return unsubscribe;
       }, [navigation]);
 
+    //Screen is Initialized
     useEffect(() => 
+    {
+        checkUserSigned();
+    }, []);
+
+    //Check if the is a User is Sign In
+    const checkUserSigned = () =>
     {
         const user = auth().currentUser;
         if (!user) 
@@ -27,7 +35,7 @@ export default function FirstScreen({navigation})
         {
             navigator.navigate("MainScreen");  
         }
-    }, []);
+    }
 
     return (
         <View style={styles.mainContainer}>

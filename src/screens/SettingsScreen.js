@@ -5,7 +5,7 @@ import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-export default function UserScreen({navigation})
+export default function SettingsScreen({navigation})
 {   
     const navigator = useNavigation();
 

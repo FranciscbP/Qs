@@ -10,7 +10,7 @@ import SignInScreen from "./screens/SignIn";
 import SignUpScreen from "./screens/SignUp";
 import FavouritesScreen from "./screens/FavouritesScreen"
 import MapScreen from "./screens/MapScreen";
-import UserScreen from "./screens/UserScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 import PlaceScreen from "./screens/PlaceScreen";
 
 // Icons
@@ -86,7 +86,7 @@ function BottomNavigator()
                     }
                 }}
             />
-            <Tab.Screen name={settingsScreen} component={UserScreen} 
+            <Tab.Screen name={settingsScreen} component={SettingsScreen} 
                 options={{ 
                     tabBarIcon: ({focused}) => 
                     { 
