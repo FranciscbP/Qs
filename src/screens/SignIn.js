@@ -110,9 +110,9 @@ export default function SignIn({navigation})
             <View style={styles.logInContainer}>
                 <Text style={{marginBottom: '5%',fontSize: 25, color:'white'}}>Sign In</Text>
                 <Text style={{fontSize: 18, color: '#F95F6B'}}>Email</Text>
-                <TextInput style={{borderBottomWidth:1, marginBottom:"2%"}} placeholder="example@email.com" value={email} onChangeText={(value) => setEmail(value)}/>
+                <TextInput style={{borderBottomWidth:1, marginBottom:"2%", color:"#DCDCDC"}} placeholder="example@email.com" placeholderTextColor={"#DCDCDC"} value={email} onChangeText={(value) => setEmail(value)}/>
                 <Text style={{fontSize: 18, color: '#F95F6B'}}>Password</Text>
-                <TextInput style={{borderBottomWidth:1, marginBottom:"10%"}} placeholder="password1234" secureTextEntry={true} value={password} onChangeText={(value) => setPassword(value)}/>
+                <TextInput style={{borderBottomWidth:1, marginBottom:"10%", color:"#DCDCDC"}} placeholder="password1234" placeholderTextColor={"#DCDCDC"} secureTextEntry={true} value={password} onChangeText={(value) => setPassword(value)}/>
                 <TouchableOpacity style={{backgroundColor:'#F95F6B', alignItems:'center', borderRadius:4, height:50}} onPress={onSingInBtnPressed}>
                     <Text style={{fontSize: 20, marginTop:10, color:'white'}}>Sign In</Text>
                 </TouchableOpacity>

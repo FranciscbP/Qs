@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import Logo from "../assets/logo.png";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function SettingsScreen({navigation})
 {   
@@ -124,45 +125,67 @@ export default function SettingsScreen({navigation})
     <View style={styles.container}>
         <Image source={Logo} style={styles.logo}></Image>
         <View style={styles.mainContainer}>
-            <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>User</Text>
-            <Text style={{fontSize: 18, color: 'white'}}>Email</Text>
-            <TextInput style={{borderBottomWidth:1, marginBottom:"2%"}} value={user.email} editable={false} selectTextOnFocus={false} />
+            <View style={{width:"100%", height:"100%"}}>
+                <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>User</Text>
+                <Text style={{fontSize: 18, color: 'white'}}>Email</Text>
+                <TextInput style={{borderBottomWidth:1, marginBottom:"2%", color:"grey"}} value={user.email} editable={false} selectTextOnFocus={false} />
 
-            <Text style={{marginBottom: '5%',marginTop:'3%',fontSize: 25, color:'#F95F6B'}}>Settings</Text>
-            <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize:18, color: 'white'}}>Show Bars</Text>
-                <Switch style={{flex:1, alignContent:'flex-end'}}
-                    trackColor={{ false: "#F95F6B", true: "white" }}
-                    thumbColor={isBarEnabled ? "#F95F6B" : "white"}
-                    onValueChange={toggleBarSwitch}
-                    value={isBarEnabled}
-                />
-            </View>
-            <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize:18, color: 'white'}}>Show Clubs</Text>
-                <Switch style={{flex:1, alignContent:'flex-end'}}
-                    trackColor={{ false: "#F95F6B", true: "white" }}
-                    thumbColor={isClubEnabled ? "#F95F6B" : "white"}
-                    onValueChange={toggleClubSwitch}
-                    value={isClubEnabled}
-                />
-            </View>
-            <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize:18, color: 'white'}}>Show Restaurants</Text>
-                <Switch style={{flex:1, alignContent:'flex-end'}}
-                    trackColor={{ false: "#F95F6B", true: "white" }}
-                    thumbColor={isRestaurantEnabled ? "#F95F6B" : "white"}
-                    onValueChange={toggleRestaurantSwitch}
-                    value={isRestaurantEnabled}
-                />
-            </View>
-            <TouchableOpacity style={{backgroundColor:'grey', alignItems:'center', borderRadius:4, height:50, marginTop:'10%', marginBottom:'5%'}} onPress={onResetPasswordButtonPressed}>
-                <Text style={{fontSize: 20, marginTop:10, color:'white'}}>Reset Password</Text>
-            </TouchableOpacity>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text style={{marginBottom: '5%',marginTop:'3%',fontSize: 25, color:'#F95F6B'}}>Settings</Text>
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize:18, color: 'white'}}>Show Bars</Text>
+                        <Switch style={{flex:1, alignContent:'flex-end'}}
+                            trackColor={{ false: "#F95F6B", true: "white" }}
+                            thumbColor={isBarEnabled ? "#F95F6B" : "white"}
+                            onValueChange={toggleBarSwitch}
+                            value={isBarEnabled}
+                        />
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize:18, color: 'white'}}>Show Clubs</Text>
+                        <Switch style={{flex:1, alignContent:'flex-end'}}
+                            trackColor={{ false: "#F95F6B", true: "white" }}
+                            thumbColor={isClubEnabled ? "#F95F6B" : "white"}
+                            onValueChange={toggleClubSwitch}
+                            value={isClubEnabled}
+                        />
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize:18, color: 'white'}}>Show Restaurants</Text>
+                        <Switch style={{flex:1, alignContent:'flex-end'}}
+                            trackColor={{ false: "#F95F6B", true: "white" }}
+                            thumbColor={isRestaurantEnabled ? "#F95F6B" : "white"}
+                            onValueChange={toggleRestaurantSwitch}
+                            value={isRestaurantEnabled}
+                        />
+                    </View>
+                    <TouchableOpacity style={{backgroundColor:'grey', alignItems:'center', borderRadius:4, height:50, marginTop:'10%', marginBottom:'5%'}} onPress={onResetPasswordButtonPressed}>
+                        <Text style={{fontSize: 20, marginTop:10, color:'white'}}>Reset Password</Text>
+                    </TouchableOpacity>
 
-            <TouchableOpacity style={{backgroundColor:'#F95F6B', alignItems:'center', borderRadius:4, height:50}} onPress={onLogoutPressed}>
-                <Text style={{fontSize: 20, marginTop:10, color:'white'}}>Log Out</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor:'#F95F6B', alignItems:'center', borderRadius:4, height:50}} onPress={onLogoutPressed}>
+                        <Text style={{fontSize: 20, marginTop:10, color:'white'}}>Log Out</Text>
+                    </TouchableOpacity>
+                    <View>
+                        {/* Scroll view Blanc Space */}
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                        <Text></Text>
+                    </View>
+                </ScrollView>
+            </View> 
         </View>
     </View>
     );
@@ -172,7 +195,7 @@ const styles = StyleSheet.create({
     container:
     { 
         flex:1,
-        backgroundColor: 'rgb(82,82,82)',
+        backgroundColor: 'rgb(81,81,81)',
         alignItems:'center',
         justifyContent:'center'
     },
@@ -186,7 +209,6 @@ const styles = StyleSheet.create({
     {
         margin:'3%',
         flex:1,
-        backgroundColor: 'rgb(61,61,61)',
         flexDirection:'row',
         alignItems: 'center',
         justifyContent: 'center',

@@ -1,4 +1,4 @@
-// Libs
+// Packages
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -17,7 +17,6 @@ import PlaceScreen from "./screens/PlaceScreen";
 import heartIcon from "./assets/heart.png"
 import logoNoText from "./assets/logo-no-text.png"
 import settingIcon from "./assets/settings.png"
-
 
 // Screen Names
 const firstScreen = 'FirstScreen';
@@ -42,17 +41,16 @@ function BottomNavigator()
             screenOptions = {{
                 tabBarShowLabel: false,
                 headerShown: false,
-                activeTintColor: '#0091EA',
-                inactiveTintColor: 'gray',
                 tabBarStyle:{
-                    borderColor:'rgb(61,61,61)',
+                    borderTopWidth:0,
+                    borderWidth:0,
                     position: 'absolute',
                     bottom: 30,
                     height: 90,
+                    elevation:10,
                     left: windowWdth * 0.05,
                     right: windowWdth * 0.05,
                     width: windowWdth * 0.9,
-                    elevation: 10,
                     borderRadius: 15,
                     backgroundColor: 'rgb(61,61,61)',
                     alignItems:"center",

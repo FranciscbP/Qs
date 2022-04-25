@@ -1,15 +1,16 @@
+//Packages
 import React, { useState, useEffect } from "react";
-import { View,Image, StyleSheet, Text,ScrollView,Animated,Dimensions,TouchableOpacity} from 'react-native';
-
+import { View,Image, StyleSheet, Text,Animated,Dimensions,TouchableOpacity} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import MapView, { PROVIDER_GOOGLE , Marker, Callout} from 'react-native-maps';
 
+//Window Size
 const windowWdth = Dimensions.get('window').width;
 const cardWdth = windowWdth * 0.9;
 
-export default function MainScreen({navigation, plce})
+export default function MapScreen({navigation, plce})
 {
     const navigator = useNavigation();
 
@@ -39,9 +40,11 @@ export default function MainScreen({navigation, plce})
     const FavouriteColor = "#F95F6B";
     const NoFavouriteColor = "white";
 
+    //Map Variables
     let mapAnimation = new Animated.Value(0);
     let mapIndex = 0;
 
+    //Refs
     const _map = React.useRef(null);
     const _scrollView = React.useRef(null);
     const _marker = React.useRef(null);
@@ -70,6 +73,7 @@ export default function MainScreen({navigation, plce})
         return strTime + "  " + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
     }
 
+        //Get Status Reports
       const checkReports = (repList, placeID) =>
       {
         let placeReports = [];
@@ -142,6 +146,7 @@ export default function MainScreen({navigation, plce})
 
       }
 
+      //Get Marker List
     const getMarkers = async() =>
     {
         markersList.splice(0, markersList.length);
@@ -442,6 +447,7 @@ export default function MainScreen({navigation, plce})
         return data;
     }
 
+    //Wait to Load  Marker Data
     if (loadMarkers)
     {
         getMarkers()
@@ -467,6 +473,7 @@ export default function MainScreen({navigation, plce})
         }); 
     }
 
+    // Display Markers in Map
     const drawMarkers = () =>
     {
         if (mList.length > 0)
@@ -488,6 +495,7 @@ export default function MainScreen({navigation, plce})
         }
     }
         
+    // Render Card
     const renderCard = (item) =>
     {   
         return(
@@ -497,11 +505,11 @@ export default function MainScreen({navigation, plce})
                 </View>
                 <View style={{flex:2}}> 
                     <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row"}}>
-                        <Text style={{color:"rgb(60,60,60)"}}>Queue Status: </Text>
+                        <Text style={{color:"#DCDCDC"}}>Queue Status: </Text>
                         <Text numberOfLines={1} style={{fontSize:14,color:item.placeStatusColor, marginLeft:0}}>{item.placeStatus}</Text>
                     </View>
                     <View style={{marginLeft: cardWdth * 0.05, flexDirection:"row",marginTop:5}}> 
-                        <Text style={{color:"rgb(60,60,60)"}}>Last Updated: </Text>
+                        <Text style={{color:"#DCDCDC"}}>Last Updated: </Text>
                         <Text numberOfLines={1} style={{fontSize:14,color: "white", marginLeft:0}}>{item.placeLastReport}</Text>
                     </View>
                     <View style={{justifyContent:"center", alignItems:"center",width:cardWdth,marginTop:15}}>
@@ -514,6 +522,7 @@ export default function MainScreen({navigation, plce})
           )
     }
 
+    //Place Status Card List
     const drawCardFlatList = () =>
     {
         if(!loadMarkers)
@@ -525,6 +534,7 @@ export default function MainScreen({navigation, plce})
         }
     }
 
+    //When user presses marker
     const onMarkerPress = (mapEventData) =>
     {
         const markerID = mapEventData._targetInst.return.index;
@@ -591,6 +601,7 @@ export default function MainScreen({navigation, plce})
     });
 });
     
+    //While getting the data from database
     const whileLoading = () =>
     {
         if(loadMarkers)

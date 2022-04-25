@@ -255,7 +255,7 @@ export default function Favourites({navigation,plce})
       {
           return(
             <View style={{flexDirection:"row", marginLeft:cardWdth*0.05}}>
-                <Text style={{color:"rgb(60,60,60)"}}>{"Status: "}</Text>
+                <Text style={{color:"grey"}}>{"Status: "}</Text>
                 <Text numberOfLines={1} style={{color:item.placeStatusColor}}>{item.placeStatus}</Text>
             </View>
           )
@@ -265,7 +265,7 @@ export default function Favourites({navigation,plce})
       {
         return(
             <View style={{flexDirection:"row", marginLeft:cardWdth*0.05, marginTop: 5}}>
-                <Text style={{color:"rgb(60,60,60)"}}>{"Last Updated: "}</Text>
+                <Text style={{color:"grey"}}>{"Last Updated: "}</Text>
                 <Text numberOfLines={1} style={{color:"white"}}>{item.placeLastReport}</Text>
             </View>
           )
@@ -300,7 +300,6 @@ export default function Favourites({navigation,plce})
     <View style={styles.container}>
         <Image source={Logo} style={styles.logo}></Image>
         <View style={styles.mainContainer}>
-            {/* <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>Favourite Places</Text> */}
             <Text style={{marginBottom: '5%',fontSize: 25, color:'#F95F6B'}}>Favourites</Text>
             <View style={{width:"100%", height:"70%"}}>
                 {whileLoading()}
@@ -314,7 +313,7 @@ const styles = StyleSheet.create({
     container:
     { 
         flex:1,
-        backgroundColor: 'rgb(82,82,82)',
+        backgroundColor: 'rgb(81,81,81)',
         alignItems:'center',
         justifyContent:'center'
     },
@@ -338,7 +337,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         borderWidth: 1,
         borderColor: 'grey',
-        backgroundColor: "rgb(70,70,70)",
+        backgroundColor: "rgb(61,61,61)",
         borderRadius: 10,
     },
 })

@@ -485,21 +485,21 @@ export default function Place({route,navigation,stat})
                         <Text style={styles.pageTitle}>Status</Text>
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
-                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Queue Status:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"grey"}}>Queue Status:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingQueueStatus()}
                         </View>
                        
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", height:30}}>
-                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Last Report:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"grey"}}>Last Report:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingLastStatus()}
                         </View>
                         
                     </View>
                     <View style={{marginTop:10,marginLeft:windowWdth*0.05,marginRight:windowWdth*0.05,alignItems:"center", flexDirection:"row", heigh:30}}>
-                        <Text style={{flex:3,fontSize:18,color:"rgb(60,60,60)"}}>Last Hour Reports:</Text>
+                        <Text style={{flex:3,fontSize:18,color:"grey"}}>Last Hour Reports:</Text>
                         <View style={{alignItems:"flex-end", marginRight:5}}>
                             {whileLoadingNumberOfReports()}
                         </View>
@@ -508,7 +508,7 @@ export default function Place({route,navigation,stat})
                         <View style={{marginTop:20,alignItems:"center",borderRadius: 10,overflow:"hidden",borderColor:"grey", width: windowWdth * 0.9}}>
                             <Picker
                                 selectedValue={selectedValue}
-                                style={{width: "100%", height: 50,backgroundColor: "grey",justifyContent:"center", textAlign:"center"}}
+                                style={{width: "100%", height: 50,color: "white",backgroundColor: "grey", }}
                                 onValueChange={(itemValue) => {setSelectedValue(itemValue)}}
                             >
                                 <Picker.Item label="Not Busy" value="Not Busy"/>
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     container:
     { 
         flex:1,
-        backgroundColor: 'rgb(82,82,82)',
+        backgroundColor: 'rgb(81,81,81)',
         alignItems:'center',
         justifyContent:'center'
     },
