@@ -1,5 +1,4 @@
-# Qs
-Final Year Project
+# Qs - Final Year Project
 
 Nowadays transportation and queues are a big part of our lives. In big cities, citizens spend almost a third of their lives in transportation and queues. 
 It is common knowledge that people like to release the tension from their Classes, Jobs, etc.., by going out with their friends or colleagues to a Club, Restaurant or other leisure places. 
